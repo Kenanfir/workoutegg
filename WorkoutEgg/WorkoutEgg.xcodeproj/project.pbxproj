@@ -1,0 +1,663 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9F8141242DDDA2EA00B55F4A /* WorkoutEgg Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 9F8141232DDDA2EA00B55F4A /* WorkoutEgg Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9F8141252DDDA2EA00B55F4A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9F8141172DDDA2EA00B55F4A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9F8141222DDDA2EA00B55F4A;
+			remoteInfo = "WorkoutEgg Watch App";
+		};
+		9F8141362DDDA2EB00B55F4A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9F8141172DDDA2EA00B55F4A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9F8141222DDDA2EA00B55F4A;
+			remoteInfo = "WorkoutEgg Watch App";
+		};
+		9F8141402DDDA2EB00B55F4A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9F8141172DDDA2EA00B55F4A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9F8141222DDDA2EA00B55F4A;
+			remoteInfo = "WorkoutEgg Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9F81414C2DDDA2EB00B55F4A /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				9F8141242DDDA2EA00B55F4A /* WorkoutEgg Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		9F81411D2DDDA2EA00B55F4A /* WorkoutEgg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WorkoutEgg.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F8141232DDDA2EA00B55F4A /* WorkoutEgg Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WorkoutEgg Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F8141352DDDA2EB00B55F4A /* WorkoutEgg Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "WorkoutEgg Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F81413F2DDDA2EB00B55F4A /* WorkoutEgg Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "WorkoutEgg Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		9F8141272DDDA2EA00B55F4A /* WorkoutEgg Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "WorkoutEgg Watch App";
+			sourceTree = "<group>";
+		};
+		9F8141382DDDA2EB00B55F4A /* WorkoutEgg Watch AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "WorkoutEgg Watch AppTests";
+			sourceTree = "<group>";
+		};
+		9F8141422DDDA2EB00B55F4A /* WorkoutEgg Watch AppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "WorkoutEgg Watch AppUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9F8141202DDDA2EA00B55F4A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F8141322DDDA2EB00B55F4A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F81413C2DDDA2EB00B55F4A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9F8141162DDDA2EA00B55F4A = {
+			isa = PBXGroup;
+			children = (
+				9F8141272DDDA2EA00B55F4A /* WorkoutEgg Watch App */,
+				9F8141382DDDA2EB00B55F4A /* WorkoutEgg Watch AppTests */,
+				9F8141422DDDA2EB00B55F4A /* WorkoutEgg Watch AppUITests */,
+				9F81411E2DDDA2EA00B55F4A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9F81411E2DDDA2EA00B55F4A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9F81411D2DDDA2EA00B55F4A /* WorkoutEgg.app */,
+				9F8141232DDDA2EA00B55F4A /* WorkoutEgg Watch App.app */,
+				9F8141352DDDA2EB00B55F4A /* WorkoutEgg Watch AppTests.xctest */,
+				9F81413F2DDDA2EB00B55F4A /* WorkoutEgg Watch AppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9F81411C2DDDA2EA00B55F4A /* WorkoutEgg */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9F81414D2DDDA2EB00B55F4A /* Build configuration list for PBXNativeTarget "WorkoutEgg" */;
+			buildPhases = (
+				9F81411B2DDDA2EA00B55F4A /* Resources */,
+				9F81414C2DDDA2EB00B55F4A /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9F8141262DDDA2EA00B55F4A /* PBXTargetDependency */,
+			);
+			name = WorkoutEgg;
+			packageProductDependencies = (
+			);
+			productName = WorkoutEgg;
+			productReference = 9F81411D2DDDA2EA00B55F4A /* WorkoutEgg.app */;
+			productType = "com.apple.product-type.application.watchapp2-container";
+		};
+		9F8141222DDDA2EA00B55F4A /* WorkoutEgg Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9F8141492DDDA2EB00B55F4A /* Build configuration list for PBXNativeTarget "WorkoutEgg Watch App" */;
+			buildPhases = (
+				9F81411F2DDDA2EA00B55F4A /* Sources */,
+				9F8141202DDDA2EA00B55F4A /* Frameworks */,
+				9F8141212DDDA2EA00B55F4A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9F8141272DDDA2EA00B55F4A /* WorkoutEgg Watch App */,
+			);
+			name = "WorkoutEgg Watch App";
+			packageProductDependencies = (
+			);
+			productName = "WorkoutEgg Watch App";
+			productReference = 9F8141232DDDA2EA00B55F4A /* WorkoutEgg Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9F8141342DDDA2EB00B55F4A /* WorkoutEgg Watch AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9F8141502DDDA2EB00B55F4A /* Build configuration list for PBXNativeTarget "WorkoutEgg Watch AppTests" */;
+			buildPhases = (
+				9F8141312DDDA2EB00B55F4A /* Sources */,
+				9F8141322DDDA2EB00B55F4A /* Frameworks */,
+				9F8141332DDDA2EB00B55F4A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9F8141372DDDA2EB00B55F4A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				9F8141382DDDA2EB00B55F4A /* WorkoutEgg Watch AppTests */,
+			);
+			name = "WorkoutEgg Watch AppTests";
+			packageProductDependencies = (
+			);
+			productName = "WorkoutEgg Watch AppTests";
+			productReference = 9F8141352DDDA2EB00B55F4A /* WorkoutEgg Watch AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		9F81413E2DDDA2EB00B55F4A /* WorkoutEgg Watch AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9F8141532DDDA2EB00B55F4A /* Build configuration list for PBXNativeTarget "WorkoutEgg Watch AppUITests" */;
+			buildPhases = (
+				9F81413B2DDDA2EB00B55F4A /* Sources */,
+				9F81413C2DDDA2EB00B55F4A /* Frameworks */,
+				9F81413D2DDDA2EB00B55F4A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9F8141412DDDA2EB00B55F4A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				9F8141422DDDA2EB00B55F4A /* WorkoutEgg Watch AppUITests */,
+			);
+			name = "WorkoutEgg Watch AppUITests";
+			packageProductDependencies = (
+			);
+			productName = "WorkoutEgg Watch AppUITests";
+			productReference = 9F81413F2DDDA2EB00B55F4A /* WorkoutEgg Watch AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9F8141172DDDA2EA00B55F4A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					9F81411C2DDDA2EA00B55F4A = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					9F8141222DDDA2EA00B55F4A = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					9F8141342DDDA2EB00B55F4A = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 9F8141222DDDA2EA00B55F4A;
+					};
+					9F81413E2DDDA2EB00B55F4A = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 9F8141222DDDA2EA00B55F4A;
+					};
+				};
+			};
+			buildConfigurationList = 9F81411A2DDDA2EA00B55F4A /* Build configuration list for PBXProject "WorkoutEgg" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 9F8141162DDDA2EA00B55F4A;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 9F81411E2DDDA2EA00B55F4A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9F81411C2DDDA2EA00B55F4A /* WorkoutEgg */,
+				9F8141222DDDA2EA00B55F4A /* WorkoutEgg Watch App */,
+				9F8141342DDDA2EB00B55F4A /* WorkoutEgg Watch AppTests */,
+				9F81413E2DDDA2EB00B55F4A /* WorkoutEgg Watch AppUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9F81411B2DDDA2EA00B55F4A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F8141212DDDA2EA00B55F4A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F8141332DDDA2EB00B55F4A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F81413D2DDDA2EB00B55F4A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9F81411F2DDDA2EA00B55F4A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F8141312DDDA2EB00B55F4A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F81413B2DDDA2EB00B55F4A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9F8141262DDDA2EA00B55F4A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9F8141222DDDA2EA00B55F4A /* WorkoutEgg Watch App */;
+			targetProxy = 9F8141252DDDA2EA00B55F4A /* PBXContainerItemProxy */;
+		};
+		9F8141372DDDA2EB00B55F4A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9F8141222DDDA2EA00B55F4A /* WorkoutEgg Watch App */;
+			targetProxy = 9F8141362DDDA2EB00B55F4A /* PBXContainerItemProxy */;
+		};
+		9F8141412DDDA2EB00B55F4A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9F8141222DDDA2EA00B55F4A /* WorkoutEgg Watch App */;
+			targetProxy = 9F8141402DDDA2EB00B55F4A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		9F8141472DDDA2EB00B55F4A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		9F8141482DDDA2EB00B55F4A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		9F81414A2DDDA2EB00B55F4A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"WorkoutEgg Watch App/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = WorkoutEgg;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKWatchOnly = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.academy.WorkoutEgg.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		9F81414B2DDDA2EB00B55F4A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"WorkoutEgg Watch App/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = WorkoutEgg;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKWatchOnly = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.academy.WorkoutEgg.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
+		9F81414E2DDDA2EB00B55F4A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_KEY_CFBundleDisplayName = WorkoutEgg;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.academy.WorkoutEgg;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		9F81414F2DDDA2EB00B55F4A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_KEY_CFBundleDisplayName = WorkoutEgg;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.academy.WorkoutEgg;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9F8141512DDDA2EB00B55F4A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.academy.WorkoutEgg-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WorkoutEgg Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WorkoutEgg Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		9F8141522DDDA2EB00B55F4A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.academy.WorkoutEgg-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WorkoutEgg Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WorkoutEgg Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
+		9F8141542DDDA2EB00B55F4A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.academy.WorkoutEgg-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "WorkoutEgg Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		9F8141552DDDA2EB00B55F4A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.academy.WorkoutEgg-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "WorkoutEgg Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9F81411A2DDDA2EA00B55F4A /* Build configuration list for PBXProject "WorkoutEgg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F8141472DDDA2EB00B55F4A /* Debug */,
+				9F8141482DDDA2EB00B55F4A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9F8141492DDDA2EB00B55F4A /* Build configuration list for PBXNativeTarget "WorkoutEgg Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F81414A2DDDA2EB00B55F4A /* Debug */,
+				9F81414B2DDDA2EB00B55F4A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9F81414D2DDDA2EB00B55F4A /* Build configuration list for PBXNativeTarget "WorkoutEgg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F81414E2DDDA2EB00B55F4A /* Debug */,
+				9F81414F2DDDA2EB00B55F4A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9F8141502DDDA2EB00B55F4A /* Build configuration list for PBXNativeTarget "WorkoutEgg Watch AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F8141512DDDA2EB00B55F4A /* Debug */,
+				9F8141522DDDA2EB00B55F4A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9F8141532DDDA2EB00B55F4A /* Build configuration list for PBXNativeTarget "WorkoutEgg Watch AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F8141542DDDA2EB00B55F4A /* Debug */,
+				9F8141552DDDA2EB00B55F4A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9F8141172DDDA2EA00B55F4A /* Project object */;
+}

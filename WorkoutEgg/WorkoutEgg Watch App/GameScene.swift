@@ -15,7 +15,7 @@ class GameScene: SKScene {
     
     override func sceneDidLoad() {
         print("Scene did load") // Debug print
-        backgroundColor = .white
+        backgroundColor = .red
         isUserInteractionEnabled = true
         scaleMode = .resizeFill // Make the scene fill the entire screen
         anchorPoint = CGPoint(x: 0.5, y: 0.5) // Set anchor point to center
@@ -36,7 +36,7 @@ class GameScene: SKScene {
         }
         
         // Keep original size but scale it down to fit
-        let scale: CGFloat = 1 // Scale down to half size
+        let scale: CGFloat = 0.5 // Scale down to half size
         egg.size = CGSize(width: egg.size.width * scale, height: egg.size.height * scale)
         
         // Position the egg at the center (0,0 since we set anchorPoint to center)

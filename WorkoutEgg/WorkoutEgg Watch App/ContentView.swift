@@ -69,9 +69,11 @@ struct ContentView: View {
                     .onAppear {
                         print("SpriteView appeared") // Debug print
                     }
+                    .ignoresSafeArea(.all)
             }
-            .frame(width: 200, height: 200)
+            .frame(width: 300, height: 300)
             .tag(0)
+//            .ignoresSafeArea(.all)
             
             // Calories View
             VStack {

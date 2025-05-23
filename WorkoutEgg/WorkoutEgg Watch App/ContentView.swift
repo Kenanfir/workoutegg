@@ -351,20 +351,6 @@ struct ContentView: View {
             }
             .frame(width: 300, height: 300)
             .tag(1)
-            
-            // Calories View
-            VStack {
-                Image(systemName: "flame.fill")
-                    .imageScale(.large)
-                    .foregroundStyle(.orange)
-                Text("\(Int(healthKitManager.caloriesBurned))")
-                    .font(.system(size: 40, weight: .bold))
-                Text("calories")
-                    .font(.custom("VCROSDMono", size: 18))
-                    .foregroundStyle(.light1)
-            }
-            .padding()
-            .tag(2)
 
             // Workout Stats View (Right)
             WorkoutStatsView(petData: currentPet, healthKitManager: healthKitManager)

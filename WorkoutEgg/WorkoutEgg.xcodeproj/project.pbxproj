@@ -71,6 +71,11 @@
 			path = "WorkoutEgg Watch AppUITests";
 			sourceTree = "<group>";
 		};
+		AA11658A2DE005DC00C15830 /* Font */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Font;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +110,7 @@
 				9F8141382DDDA2EB00B55F4A /* WorkoutEgg Watch AppTests */,
 				9F8141422DDDA2EB00B55F4A /* WorkoutEgg Watch AppUITests */,
 				9F81411E2DDDA2EA00B55F4A /* Products */,
+				AA11658A2DE005DC00C15830 /* Font */,
 			);
 			sourceTree = "<group>";
 		};
@@ -155,6 +161,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				9F8141272DDDA2EA00B55F4A /* WorkoutEgg Watch App */,
+				AA11658A2DE005DC00C15830 /* Font */,
 			);
 			name = "WorkoutEgg Watch App";
 			packageProductDependencies = (
@@ -454,8 +461,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"WorkoutEgg Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = A4G9JM3S8X;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "WorkoutEgg-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = WorkoutEgg;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Burned Energy";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
@@ -465,7 +474,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.academy.WorkoutEgg.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alifdimasius.WorkoutEgg.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -485,8 +494,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"WorkoutEgg Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = A4G9JM3S8X;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "WorkoutEgg-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = WorkoutEgg;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Burned Energy";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
@@ -496,7 +507,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.academy.WorkoutEgg.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alifdimasius.WorkoutEgg.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -513,9 +524,10 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A4G9JM3S8X;
 				INFOPLIST_KEY_CFBundleDisplayName = WorkoutEgg;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.academy.WorkoutEgg;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alifdimasius.WorkoutEgg;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
@@ -527,9 +539,10 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A4G9JM3S8X;
 				INFOPLIST_KEY_CFBundleDisplayName = WorkoutEgg;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.academy.WorkoutEgg;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alifdimasius.WorkoutEgg;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
@@ -545,7 +558,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.academy.WorkoutEgg-Watch-AppTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alifdimasius.WorkoutEgg-Watch-AppTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -564,7 +577,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.academy.WorkoutEgg-Watch-AppTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alifdimasius.WorkoutEgg-Watch-AppTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -583,7 +596,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.academy.WorkoutEgg-Watch-AppUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alifdimasius.WorkoutEgg-Watch-AppUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -601,7 +614,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.academy.WorkoutEgg-Watch-AppUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alifdimasius.WorkoutEgg-Watch-AppUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SWIFT_EMIT_LOC_STRINGS = NO;

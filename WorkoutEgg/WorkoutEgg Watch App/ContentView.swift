@@ -58,6 +58,13 @@ struct ContentView: View {
         return scene
     }()
     
+    @State private var progressScene: ProgressScene = {
+        let scene = ProgressScene()
+        scene.size = CGSize(width: 300, height: 300) // Match your view size
+        scene.scaleMode = .resizeFill
+        return scene
+    }()
+    
     var body: some View {
         TabView {
             // Egg Scene View
@@ -66,14 +73,27 @@ struct ContentView: View {
                 
                 SpriteView(scene: gameScene)
                     .gesture(tap)
-                    .onAppear {
-                        print("SpriteView appeared") // Debug print
-                    }
                     .ignoresSafeArea(.all)
             }
             .frame(width: 300, height: 300)
             .tag(0)
-//            .ignoresSafeArea(.all)
+            
+            // Progress Scene View
+            GeometryReader { geoProxy in
+                SpriteView(scene: progressScene)
+                    .onAppear {
+                        let newSize = geoProxy.size
+                        progressScene.size = CGSize(width: newSize.width, height: newSize.height)
+                        progressScene.scaleMode = .resizeFill
+                        progressScene.updateProgress(current: Int(healthKitManager.caloriesBurned))
+                    }
+                    .onChange(of: healthKitManager.caloriesBurned) { newValue in
+                        progressScene.updateProgress(current: Int(newValue))
+                    }
+                    .ignoresSafeArea(.all)
+            }
+            .frame(width: 300, height: 300)
+            .tag(1)
             
             // Calories View
             VStack {
@@ -83,11 +103,11 @@ struct ContentView: View {
                 Text("\(Int(healthKitManager.caloriesBurned))")
                     .font(.system(size: 40, weight: .bold))
                 Text("calories")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.custom("VCROSDMono", size: 18))
+                    .foregroundStyle(.light1)
             }
             .padding()
-            .tag(1)
+            .tag(2)
         }
         .tabViewStyle(.page)
     }
@@ -128,20 +148,6 @@ struct ContentView: View {
         print("Scene coords: \(pScene)")
         
         return pScene
-    }
-    
-    // Get view size including safe areas
-    func getViewSize(_ geoProxy: GeometryProxy) -> CGSize {
-        // Unpack safe area size and surrounding insets
-        let (wSafe, hSafe) = geoProxy.size.unpack()
-        let insets = geoProxy.safeAreaInsets
-        let (top, bottom) = (insets.top, insets.bottom)
-        let (left, right) = (insets.leading, insets.trailing)
-        
-        // Add insets to safe area size
-        let wView = wSafe + left + right
-        let hView = hSafe + top + bottom
-        return CGSize(width: wView, height: hView)
     }
 }
 

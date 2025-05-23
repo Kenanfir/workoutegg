@@ -15,9 +15,15 @@ class GameScene: SKScene {
     
     override func sceneDidLoad() {
         print("Scene did load") // Debug print
-        backgroundColor = .red
+        let background = SKSpriteNode(imageNamed: "Background/bg-sky-blue")
+        background.position = CGPoint(x: 0, y: 0)
+        background.zPosition = -1 // Place it behind other elements
+        
+        background.setScale(0.75)
+        
+        addChild(background)
         isUserInteractionEnabled = true
-        scaleMode = .resizeFill // Make the scene fill the entire screen
+        scaleMode = .aspectFit // Make the scene fill the entire screen
         anchorPoint = CGPoint(x: 0.5, y: 0.5) // Set anchor point to center
         setupEgg()
     }
@@ -25,7 +31,7 @@ class GameScene: SKScene {
     private func setupEgg() {
         print("Setting up egg") // Debug print
         // Create the egg sprite
-        let egg = SKSpriteNode(imageNamed: "EggSampleOne")
+        let egg = SKSpriteNode(imageNamed: "Egg/egg-2-wo-normal")
         
         // Debug print to check if image was loaded
         if egg.texture == nil {
@@ -36,11 +42,14 @@ class GameScene: SKScene {
         }
         
         // Keep original size but scale it down to fit
-        let scale: CGFloat = 0.5 // Scale down to half size
+        let scale: CGFloat = 0.6 // Scale down to half size
         egg.size = CGSize(width: egg.size.width * scale, height: egg.size.height * scale)
         
+        // Set the anchor point to the bottom center
+        egg.anchorPoint = CGPoint(x: 0.5, y: 0.0)
+        
         // Position the egg at the center (0,0 since we set anchorPoint to center)
-        egg.position = CGPoint(x: 0, y: 0)
+        egg.position = CGPoint(x: 0, y: -15) // Moved up by 50 points
         print("Egg position: \(egg.position)") // Debug print
         print("Scene frame: \(frame)") // Debug print
         
@@ -61,6 +70,21 @@ class GameScene: SKScene {
         }
     }
     
+    func wiggleEgg(_ egg: SKSpriteNode) {
+        // Create a sequence of actions for the wiggle
+        let rotateRight = SKAction.rotate(toAngle: .pi / 20, duration: 0.2)
+        let rotateLeft = SKAction.rotate(toAngle: -.pi / 20, duration: 0.2)
+        let wiggle = SKAction.sequence([rotateRight, rotateLeft])
+        let repeatWiggle = SKAction.repeat(wiggle, count: 2) // Wiggle twice and stop
+        let returnToCenter = SKAction.rotate(toAngle: 0, duration: 0.2)
+        
+        // Combine all actions into one sequence
+        let fullAnimation = SKAction.sequence([repeatWiggle, returnToCenter])
+        
+        // Run the animation
+        egg.run(fullAnimation)
+    }
+    
     // Method to handle tap points from SwiftUI
     func onTap(_ point: CGPoint) {
         print("Received tap at: \(point)") // Debug tap position
@@ -76,7 +100,7 @@ class GameScene: SKScene {
             if eggFrame.contains(point) {
                 print("Egg tapped!")
                 marker.fillColor = .green // Green for successful tap
-                bounceEgg(egg)
+                wiggleEgg(egg)
             } else {
                 print("Tap missed egg. Distance from egg center: \(distance(from: point, to: egg.position))")
                 marker.fillColor = .red // Red for missed tap
@@ -99,15 +123,5 @@ class GameScene: SKScene {
         let dx = point1.x - point2.x
         let dy = point1.y - point2.y
         return sqrt(dx*dx + dy*dy)
-    }
-    
-    func bounceEgg (_ egg: SKSpriteNode) {
-        // Create a sequence of actions for the bounce
-        let scaleUp = SKAction.scale(to: 1.2, duration: 0.1)
-        let scaleDown = SKAction.scale(to: 1.0, duration: 0.1)
-        let bounce = SKAction.sequence([scaleUp, scaleDown])
-    
-        // Run the animation
-        egg.run(bounce)
     }
 }

@@ -13,5 +13,6 @@ struct WorkoutEgg_Watch_AppApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: PetData.self)
     }
 }

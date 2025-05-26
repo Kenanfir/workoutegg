@@ -347,7 +347,7 @@ struct ContentView: View {
                     .onChange(of: healthKitManager.caloriesBurned) { newValue in
                         progressScene.updateProgress(current: Int(newValue))
                     }
-                    .ignoresSafeArea(.all)
+                    .ignoresSafeArea()
             }
             .frame(width: 300, height: 300)
             .tag(1)

@@ -15,7 +15,14 @@ class GameScene: SKScene {
     
     override func sceneDidLoad() {
         print("Scene did load") // Debug print
-        let background = SKSpriteNode(imageNamed: "Background/bg-sky-blue")
+        // ngefix background X
+        let background = SKSpriteNode(imageNamed: "background/bg-sky-blue")
+        if background.texture == nil {
+            print("Failed to load background image: background/bg-sky-blue")
+        } else {
+            print("Successfully loaded background image")
+            print("Background size: \(background.size)")
+        }
         background.position = CGPoint(x: 0, y: 0)
         background.zPosition = -1 // Place it behind other elements
         

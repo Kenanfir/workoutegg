@@ -21,7 +21,13 @@ class ProgressScene: SKScene {
         removeAllChildren()
 
         // Background
-        let background = SKSpriteNode(imageNamed: "Background/bg-field")
+        let background = SKSpriteNode(imageNamed: "background/bg-field")
+        if background.texture == nil {
+            print("Failed to load background image: background/bg-field")
+        } else {
+            print("Successfully loaded background image")
+            print("Background size: \(background.size)")
+        }
         background.position = CGPoint(x: 0, y: 0)
         background.zPosition = -1
         background.setScale(2.2)

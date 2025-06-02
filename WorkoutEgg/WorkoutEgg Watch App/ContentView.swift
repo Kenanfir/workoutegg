@@ -12,6 +12,37 @@ import SwiftData
 
 // MARK: - Views
 
+struct OnboardingView: View {
+    @Binding var hasCompletedOnboarding: Bool
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Header1")
+                .font(.title3)
+                .bold()
+                .padding(.top, 40)
+            
+            Text("Header2")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            
+            Spacer()
+            
+            Button(action: {
+                hasCompletedOnboarding = true
+            }) {
+                Text("Get Started")
+                    .font(.subheadline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 40)
+        }
+    }
+}
+
 struct WorkoutStatsView: View {
     @Bindable var petData: PetData
     @ObservedObject var healthKitManager: HealthKitManager
@@ -91,6 +122,7 @@ struct ContentView: View {
     @StateObject private var healthKitManager = HealthKitManager()
     @Query private var pets: [PetData]
     @Environment(\.modelContext) private var context
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     
     // Get the current pet (or create one if none exists)
     private var currentPet: PetData {
@@ -120,55 +152,53 @@ struct ContentView: View {
     }()
     
     var body: some View {
-        TabView(selection: $selectedTab) {
-            // Status View (Left)
-            StatusView(petData: currentPet)
-                .tag(0)
-            
-            // Egg Scene View (Middle - Main Screen)
-            GeometryReader { geoProxy in
-                let tap = getTap(geoProxy)
+        if !hasCompletedOnboarding {
+            OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
+        } else {
+            TabView(selection: $selectedTab) {
+                // Status View (Left)
+                StatusView(petData: currentPet)
+                    .tag(0)
                 
-                SpriteView(scene: gameScene)
-                    .gesture(tap)
-                    .ignoresSafeArea(.all)
+                // Egg Scene View (Middle - Main Screen)
+                GeometryReader { geoProxy in
+                    let tap = getTap(geoProxy)
+                    
+                    SpriteView(scene: gameScene)
+                        .gesture(tap)
+                        .ignoresSafeArea(.all)
+                }
+                .frame(width: 300, height: 300)
+                .tag(1)
+                
+                // Progress Scene View
+                GeometryReader { geoProxy in
+                    SpriteView(scene: progressScene)
+                        .onAppear {
+                            let newSize = geoProxy.size
+                            progressScene.size = CGSize(width: newSize.width, height: newSize.height)
+                            progressScene.scaleMode = .resizeFill
+                            updateProgressDisplay()
+                        }
+                        .onChange(of: healthKitManager.cumulativeCalories) { _ in
+                            updateProgressDisplay()
+                        }
+                        .onChange(of: healthKitManager.caloriesBurned) { _ in
+                            updateProgressDisplay()
+                        }
+                        .ignoresSafeArea()
+                }
+                .frame(width: 300, height: 300)
+                .tag(2)
             }
-            .frame(width: 300, height: 300)
-            .tag(1)
-            
-            // Progress Scene View
-            GeometryReader { geoProxy in
-                SpriteView(scene: progressScene)
-                    .onAppear {
-                        let newSize = geoProxy.size
-                        progressScene.size = CGSize(width: newSize.width, height: newSize.height)
-                        progressScene.scaleMode = .resizeFill
-                        updateProgressDisplay()
-                    }
-                    .onChange(of: healthKitManager.cumulativeCalories) { _ in
-                        updateProgressDisplay()
-                    }
-                    .onChange(of: healthKitManager.caloriesBurned) { _ in
-                        updateProgressDisplay()
-                    }
-                    .ignoresSafeArea()
+            .tabViewStyle(.page)
+            .onAppear {
+                // Set up the connection between HealthKitManager and PetData
+                healthKitManager.setPetData(currentPet)
+                
+                // Check for missed workouts when app opens
+                currentPet.checkMissedFed()
             }
-            .frame(width: 300, height: 300)
-            .tag(2)
-
-            // Workout Stats View (Right)
-            WorkoutStatsView(petData: currentPet, healthKitManager: healthKitManager)
-                .tag(3)
-        }
-        .tabViewStyle(.page)
-        .onAppear {
-            // Set up the connection between HealthKitManager and PetData
-            healthKitManager.setPetData(currentPet)
-            
-            // Check for missed workouts when app opens
-            currentPet.checkMissedFed()
-            // Request notification permissions
-            NotificationManager.requestPermission()
         }
     }
     

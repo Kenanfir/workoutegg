@@ -2,8 +2,8 @@ import SpriteKit
 import SwiftUI
 
 class ProgressScene: SKScene {
-    private let barAssetName = "IconsAndLabels/progress-bar-filled-test"
-    private let emptyBarAssetName = "IconsAndLabels/progress-bar-empty-test"
+    private let barAssetName = "IconsAndLabels/progress-bar-full"
+    private let emptyBarAssetName = "IconsAndLabels/progress-bar"
     private var caloriesLabel: SKLabelNode?
     private let targetCalories: Int = 400
     private var currentCalories: Int = 0
@@ -14,7 +14,7 @@ class ProgressScene: SKScene {
     private var barWidth: CGFloat = 0
     private var emptyBar: SKSpriteNode?
 
-    private let barScale: CGFloat = 0.08
+    private let barScale: CGFloat = 2
 
     override func sceneDidLoad() {
         print("ProgressScene did load")
@@ -87,7 +87,7 @@ class ProgressScene: SKScene {
 
     private func setupCaloriesLabel() {
         caloriesLabel = SKLabelNode(fontNamed: "VCROSDMono")
-        caloriesLabel!.fontSize = 24
+        caloriesLabel!.fontSize = 16
         caloriesLabel!.fontColor = UIColor(Color("Light1"))
         caloriesLabel!.position = CGPoint(x: 0, y: 40)
         caloriesLabel!.text = "0 / \(targetCalories) KCal"
@@ -100,8 +100,6 @@ class ProgressScene: SKScene {
         currentCalories = current
         caloriesLabel?.text = "\(currentCalories) / \(targetCalories) KCal"
         let progress = min(max(CGFloat(currentCalories) / CGFloat(targetCalories), 0.0), 1.0)
-        print("barWidth: \(barWidth)")
-        print("Progress: \(progress), mask width: \(barWidth * progress)")
         if let mask = maskNode {
             mask.size.width = barWidth * progress
         }

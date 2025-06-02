@@ -82,6 +82,7 @@ class PetData {
     var createdDate: Date
     var isDead: Bool // New: Track if pet has died
     var missedDaysCount: Int // New: Track consecutive missed days
+    var currentDayCalories: Double // New: Track current day's calories from HealthKit
     
     // Computed properties
     var ageInDays: String {
@@ -135,6 +136,7 @@ class PetData {
         self.createdDate = createdDate
         self.isDead = isDead
         self.missedDaysCount = missedDaysCount
+        self.currentDayCalories = 0 // Initialize to 0
     }
     
     func updateAfterFed() {
@@ -190,6 +192,9 @@ class PetData {
     }
     
     func updateCumulativeCalories(todayCalories: Double) {
+        // Store the current day's calories
+        self.currentDayCalories = todayCalories
+        
         let calendar = Calendar.current
         let today = Date()
         
@@ -218,7 +223,12 @@ class PetData {
     }
     
     private func getCurrentDayCalories() -> Double {
-        return 0
+        return currentDayCalories
+    }
+
+    // SAMPLE CODE IMPLEMENTATION INVOLVES SWIFTDATA
+    func getCurrentDayFeedCount() -> Int {
+        return Int.random(in: 0...3)
     }
     
     private func updateEmotion() {

@@ -67,15 +67,12 @@ struct WorkoutStatsView: View {
     }
     
     private var displayCalories: Int {
-        return petData.stage == .egg ?
-            Int(healthKitManager.cumulativeCalories) :
-            Int(healthKitManager.caloriesBurned)
+        // Simulate 300 KCal for testing
+        return 300
     }
     
     private var caloriesLabel: String {
-        return petData.stage == .egg ?
-            "total calories (egg stage)" :
-            "calories today"
+        return "simulated calories (testing)"
     }
 }
 
@@ -145,7 +142,7 @@ struct ContentView: View {
     }()
     
     @State private var progressScene: ProgressScene = {
-        let scene = ProgressScene()
+        let scene = ProgressScene(petData: nil)
         scene.size = CGSize(width: 300, height: 300)
         scene.scaleMode = .resizeFill
         return scene
@@ -216,6 +213,33 @@ struct ContentView: View {
                                 updateProgressDisplay()
                             }
                             .ignoresSafeArea()
+                            .overlay(alignment: .bottom) {
+                                // Debug/Testing Button Overlay
+                                VStack(spacing: 8) {
+                                    Button {
+                                        updateProgressDisplay()
+                                    } label: {
+                                        HStack(spacing: 4) {
+                                            Image(systemName: "arrow.clockwise.circle.fill")
+                                            Text("Update Food")
+                                        }
+                                        .font(.caption)
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 6)
+                                        .background(Color.green)
+                                        .cornerRadius(8)
+                                    }
+                                    
+                                    Text("300 KCal (Simulated)")
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                        .padding(.horizontal, 8)
+                                        .background(Color.black.opacity(0.6))
+                                        .cornerRadius(6)
+                                }
+                                .padding(.bottom, 20)
+                            }
                     }
                     .frame(width: 300, height: 300)
                     .tag(2)
@@ -230,6 +254,9 @@ struct ContentView: View {
             // Set up the connection between GameScene and PetData
             gameScene.setPetData(currentPet)
             
+            // Set up the connection between ProgressScene and PetData
+            progressScene.setPetData(currentPet)
+            
             // Check for missed workouts when app opens
             currentPet.checkMissedFed()
         }
@@ -240,9 +267,13 @@ struct ContentView: View {
     }
     
     private func updateProgressDisplay() {
-        let displayCalories = currentPet.stage == .egg ?
-            Int(healthKitManager.cumulativeCalories) :
-            Int(healthKitManager.caloriesBurned)
+        // Simulate 300 KCal instead of using HealthKit data
+        let displayCalories = 700
+        
+        // Print debug info for currentDayFeedCount
+        let currentFoodCount = currentPet.getCurrentDayFeedCount()
+        print("🍎 Current Day Feed Count: \(currentFoodCount)")
+        print("📊 Display Calories: \(displayCalories)")
         
         progressScene.updateProgress(current: displayCalories)
     }

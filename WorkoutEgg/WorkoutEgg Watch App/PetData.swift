@@ -105,15 +105,15 @@ class PetData {
         case .egg:
             return "Egg/egg-2-wo-normal"
         case .baby:
-            return "Pet/baby-\(species.rawValue.lowercased())"
+            return "Pet-Test/baby-\(species.rawValue.lowercased())"
         case .child:
-            return "Pet/child-\(species.rawValue.lowercased())"
+            return "Pet-Test/child-\(species.rawValue.lowercased())"
         case .teen:
-            return "Pet/teen-\(species.rawValue.lowercased())"
+            return "Pet-Test/teen-\(species.rawValue.lowercased())"
         case .adult:
-            return "Pet/adult-\(species.rawValue.lowercased())"
+            return "Pet-Test/adult-\(species.rawValue.lowercased())"
         case .elder:
-            return "Pet/elder-\(species.rawValue.lowercased())"
+            return "Pet-Test/elder-\(species.rawValue.lowercased())"
         }
     }
     
@@ -147,14 +147,7 @@ class PetData {
         updateEmotion()
         
         // Check for stage evolution
-        let previousStage = stage
         checkStageEvolution()
-        
-        // Reset cumulative calories if pet evolved from egg stage
-        if previousStage == .egg && stage != .egg {
-            cumulativeCalories = 0
-            lastCalorieResetDate = Date()
-        }
     }
     
     func addCaloriesConsumed(_ calories: Double) {
@@ -261,6 +254,38 @@ class PetData {
         default:
             stage = .elder
         }
+    }
+    
+    // MARK: - Development/Testing Methods
+    
+    /// Forces the pet to evolve to the next stage by setting age to the minimum required
+    /// This is for development/testing purposes
+    func forceEvolveToNextStage() {
+        // Don't evolve if pet is dead
+        if isDead { return }
+        
+        // Set age to minimum required for next stage
+        switch stage {
+        case .egg:
+            age = 11 // Minimum for baby stage
+        case .baby:
+            age = 51 // Minimum for child stage
+        case .child:
+            age = 151 // Minimum for teen stage
+        case .teen:
+            age = 301 // Minimum for adult stage
+        case .adult:
+            age = 501 // Minimum for elder stage
+        case .elder:
+            // Already at max stage, do nothing
+            return
+        }
+        
+        // Update the stage based on new age
+        checkStageEvolution()
+        
+        // Update emotion based on current streak
+        updateEmotion()
     }
 }
 

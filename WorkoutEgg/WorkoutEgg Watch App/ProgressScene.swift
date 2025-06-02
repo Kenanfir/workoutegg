@@ -42,7 +42,6 @@ class ProgressScene: SKScene {
     }
 
     override func didChangeSize(_ oldSize: CGSize) {
-        print("didChangeSize called: new size = \(size)")
         // Remove old bar and mask if they exist
         cropNode?.removeFromParent()
         filledBar = nil

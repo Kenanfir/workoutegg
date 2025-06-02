@@ -167,6 +167,8 @@ struct ContentView: View {
             
             // Check for missed workouts when app opens
             currentPet.checkMissedFed()
+            // Request notification permissions
+            NotificationManager.requestPermission()
         }
     }
     

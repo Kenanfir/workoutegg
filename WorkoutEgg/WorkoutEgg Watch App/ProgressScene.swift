@@ -1,5 +1,6 @@
 import SpriteKit
 import SwiftUI
+import UserNotifications
 
 class ProgressScene: SKScene {
     private let barAssetName = "IconsAndLabels/progress-bar-full"
@@ -103,5 +104,8 @@ class ProgressScene: SKScene {
         if let mask = maskNode {
             mask.size.width = barWidth * progress
         }
+        
+        // Update notification with current calories
+        NotificationManager.getCustomizedMessage(calories: currentCalories)
     }
 }

@@ -10,21 +10,18 @@ import WatchKit
 
 class GameScene: SKScene {
     
-    // Debug flag to show hit area
-    let showHitArea = false
-    
     // Pet data reference
     private var petData: PetData?
     
     override func sceneDidLoad() {
-        print("Scene did load") // Debug print
+        DebugConfig.debugPrint("Scene did load")
         // ngefix background X
         let background = SKSpriteNode(imageNamed: "background/bg-sky-blue")
         if background.texture == nil {
-            print("Failed to load background image: background/bg-sky-blue")
+            DebugConfig.debugPrint("Failed to load background image: background/bg-sky-blue")
         } else {
-            print("Successfully loaded background image")
-            print("Background size: \(background.size)")
+            DebugConfig.debugPrint("Successfully loaded background image")
+            DebugConfig.debugPrint("Background size: \(background.size)")
         }
         background.position = CGPoint(x: 0, y: 0)
         background.zPosition = -1 // Place it behind other elements
@@ -56,7 +53,7 @@ class GameScene: SKScene {
     }
     
     private func setupPet() {
-        print("Setting up pet") // Debug print
+        DebugConfig.debugPrint("Setting up pet")
         
         // Get the current pet image name, fallback to egg if no pet data
         let imageName = petData?.petImageName ?? "Egg/egg-2-wo-normal"
@@ -66,10 +63,10 @@ class GameScene: SKScene {
         
         // Debug print to check if image was loaded
         if pet.texture == nil {
-            print("Failed to load pet image: \(imageName)")
+            DebugConfig.debugPrint("Failed to load pet image: \(imageName)")
         } else {
-            print("Pet image loaded successfully: \(imageName)")
-            print("Pet size: \(pet.size)")
+            DebugConfig.debugPrint("Pet image loaded successfully: \(imageName)")
+            DebugConfig.debugPrint("Pet size: \(pet.size)")
         }
         
         // Keep original size but scale it down to fit
@@ -81,8 +78,8 @@ class GameScene: SKScene {
         
         // Position the pet at the center (0,0 since we set anchorPoint to center)
         pet.position = CGPoint(x: 0, y: -15) // Moved up by 50 points
-        print("Pet position: \(pet.position)") // Debug print
-        print("Scene frame: \(frame)") // Debug print
+        DebugConfig.debugPrint("Pet position: \(pet.position)")
+        DebugConfig.debugPrint("Scene frame: \(frame)")
         
         // Name (changed from "egg" to "pet" to be more generic)
         pet.name = "pet"
@@ -91,13 +88,13 @@ class GameScene: SKScene {
         addChild(pet)
         
         // Visualize the hit area if debug flag is enabled
-        if showHitArea {
+        if DebugConfig.shouldShowHitArea {
             let hitAreaNode = SKShapeNode(rect: pet.frame)
             hitAreaNode.strokeColor = .green
             hitAreaNode.lineWidth = 0.5
             hitAreaNode.alpha = 0.4
             addChild(hitAreaNode)
-            print("Added hit area visualization: \(pet.frame)")
+            DebugConfig.debugPrint("Added hit area visualization: \(pet.frame)")
         }
     }
     
@@ -118,38 +115,40 @@ class GameScene: SKScene {
     
     // Method to handle tap points from SwiftUI
     func onTap(_ point: CGPoint) {
-        print("Received tap at: \(point)") // Debug tap position
+        DebugConfig.debugPrint("Received tap at: \(point)")
         
         if let pet = childNode(withName: "pet") as? SKSpriteNode {
             let petFrame = pet.frame
-            print("Pet position: \(pet.position), frame: \(petFrame)")
+            DebugConfig.debugPrint("Pet position: \(pet.position), frame: \(petFrame)")
             
             // Create visual indicators
             let marker = SKShapeNode(circleOfRadius: 3)
             
             // Use the exact pet frame for hit detection
             if petFrame.contains(point) {
-                print("Pet tapped!")
+                DebugConfig.debugPrint("Pet tapped!")
                 marker.fillColor = .green // Green for successful tap
                 wigglePet(pet)
                 
                 // GameScene only provides visual feedback - no feeding!
                 // Feeding is exclusively handled by ProgressScene when tapping food items
-                print("🎮 GameScene: Pet interaction complete (visual only)")
+                DebugConfig.debugPrint("🎮 GameScene: Pet interaction complete (visual only)")
             } else {
-                print("Tap missed pet. Distance from pet center: \(distance(from: point, to: pet.position))")
+                DebugConfig.debugPrint("Tap missed pet. Distance from pet center: \(distance(from: point, to: pet.position))")
                 marker.fillColor = .red // Red for missed tap
             }
             
-            // Show tap position marker
-            marker.position = point
-            marker.alpha = 0.6
-            addChild(marker)
-            
-            // Remove marker after a delay
-            let fadeOut = SKAction.fadeOut(withDuration: 0.5)
-            let remove = SKAction.removeFromParent()
-            marker.run(SKAction.sequence([SKAction.wait(forDuration: 1.0), fadeOut, remove]))
+            // Show tap position marker only in debug mode
+            if DebugConfig.shouldShowTapIndicators {
+                marker.position = point
+                marker.alpha = 0.6
+                addChild(marker)
+                
+                // Remove marker after a delay
+                let fadeOut = SKAction.fadeOut(withDuration: 0.5)
+                let remove = SKAction.removeFromParent()
+                marker.run(SKAction.sequence([SKAction.wait(forDuration: 1.0), fadeOut, remove]))
+            }
         }
     }
     

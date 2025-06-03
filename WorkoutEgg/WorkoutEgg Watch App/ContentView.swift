@@ -164,9 +164,9 @@ struct ContentView: View {
         do {
             try context.save()
             currentPet = newPet
-            print("✅ Created new pet and saved to SwiftData")
+            DebugConfig.debugPrint("✅ Created new pet and saved to SwiftData")
         } catch {
-            print("❌ Failed to save new pet: \(error)")
+            DebugConfig.debugPrint("❌ Failed to save new pet: \(error)")
         }
         return newPet
     }
@@ -248,7 +248,9 @@ struct ContentView: View {
                 .gesture(tap)
                 .ignoresSafeArea(.all)
                 .overlay(alignment: .bottom) {
-                    gameSceneOverlay
+                    if DebugConfig.shouldShowDebugUI {
+                        gameSceneOverlay
+                    }
                 }
         }
         .frame(width: 300, height: 300)
@@ -270,10 +272,10 @@ struct ContentView: View {
                 // Explicitly save the context to ensure changes persist
                 do {
                     try context.save()
-                    print("✅ SwiftData context saved after force evolution")
-                    print("🔍 Pet stage after save: \(getCurrentPet().stage.displayName)")
+                    DebugConfig.debugPrint("✅ SwiftData context saved after force evolution")
+                    DebugConfig.debugPrint("🔍 Pet stage after save: \(getCurrentPet().stage.displayName)")
                 } catch {
-                    print("❌ Failed to save SwiftData context: \(error)")
+                    DebugConfig.debugPrint("❌ Failed to save SwiftData context: \(error)")
                 }
                 
                 // Force UI updates
@@ -329,19 +331,19 @@ struct ContentView: View {
             Int(healthKitManager.cumulativeCalories) :
             Int(healthKitManager.caloriesBurned)
         
-        // Print debug info for currentDayFeedCount
+        // Debug info for currentDayFeedCount
         let currentFoodCount = getCurrentPet().getCurrentDayFeedCount()
-        print("🍎 Current Day Feed Count: \(currentFoodCount)")
-        print("📊 Display Calories: \(displayCalories)")
+        DebugConfig.debugPrint("🍎 Current Day Feed Count: \(currentFoodCount)")
+        DebugConfig.debugPrint("📊 Display Calories: \(displayCalories)")
         
         // Debug HealthKit data
-        print("🔥 HealthKit Debug:")
-        print("   - Pet Stage: \(getCurrentPet().stage.displayName)")
-        print("   - HealthKit caloriesBurned: \(healthKitManager.caloriesBurned)")
-        print("   - HealthKit cumulativeCalories: \(healthKitManager.cumulativeCalories)")
-        print("   - Pet currentDayCalories: \(getCurrentPet().currentDayCalories)")
-        print("   - Pet cumulativeCalories: \(getCurrentPet().cumulativeCalories)")
-        print("   - Final displayCalories sent to ProgressScene: \(displayCalories)")
+        DebugConfig.debugPrint("🔥 HealthKit Debug:")
+        DebugConfig.debugPrint("   - Pet Stage: \(getCurrentPet().stage.displayName)")
+        DebugConfig.debugPrint("   - HealthKit caloriesBurned: \(healthKitManager.caloriesBurned)")
+        DebugConfig.debugPrint("   - HealthKit cumulativeCalories: \(healthKitManager.cumulativeCalories)")
+        DebugConfig.debugPrint("   - Pet currentDayCalories: \(getCurrentPet().currentDayCalories)")
+        DebugConfig.debugPrint("   - Pet cumulativeCalories: \(getCurrentPet().cumulativeCalories)")
+        DebugConfig.debugPrint("   - Final displayCalories sent to ProgressScene: \(displayCalories)")
         
         progressScene.updateProgress(current: displayCalories)
     }

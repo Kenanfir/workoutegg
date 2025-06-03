@@ -43,10 +43,10 @@ class ProgressScene: SKScene {
         // Background
         let background = SKSpriteNode(imageNamed: "background/bg-field")
         if background.texture == nil {
-            print("Failed to load background image: background/bg-field")
+            DebugConfig.debugPrint("Failed to load background image: background/bg-field")
         } else {
-            print("Successfully loaded background image")
-            print("Background size: \(background.size)")
+            DebugConfig.debugPrint("Successfully loaded background image")
+            DebugConfig.debugPrint("Background size: \(background.size)")
         }
         background.position = CGPoint(x: 0, y: 0)
         background.zPosition = -1
@@ -119,7 +119,7 @@ class ProgressScene: SKScene {
         
         let plateTexture = SKTexture(imageNamed: emptyPlate)
         if plateTexture.size() == CGSize.zero {
-            print("Failed to load empty plate image: \(emptyPlate)")
+            DebugConfig.debugPrint("Failed to load empty plate image: \(emptyPlate)")
             return
         }
         
@@ -223,7 +223,7 @@ class ProgressScene: SKScene {
                 addChild(foodSprite)
                 foodSprites.append(foodSprite)
             } else {
-                print("Failed to load food texture: food-stage-\(stage)")
+                DebugConfig.debugPrint("Failed to load food texture: food-stage-\(stage)")
             }
         }
     }
@@ -298,7 +298,7 @@ class ProgressScene: SKScene {
     
     // Method to handle tap points from SwiftUI (similar to GameScene)
     func onTap(_ point: CGPoint) {
-        print("Received tap at: \(point)") // Debug tap position
+        DebugConfig.debugPrint("Received tap at: \(point)")
         
         // Check if any food sprite was tapped
         for foodSprite in foodSprites {
@@ -336,11 +336,14 @@ class ProgressScene: SKScene {
             Int(petData.currentDayCalories)
         updateProgress(current: displayCalories)
         
-        print("🍎 Pet fed! New feed count: \(petData.getCurrentDayFeedCount())")
-        print("📈 Pet age: \(petData.age), streak: \(petData.streak)")
+        DebugConfig.debugPrint("🍎 Pet fed! New feed count: \(petData.getCurrentDayFeedCount())")
+        DebugConfig.debugPrint("📈 Pet age: \(petData.age), streak: \(petData.streak)")
     }
     
     private func showTapIndicator(at location: CGPoint, success: Bool) {
+        // Only show tap indicators in debug mode
+        guard DebugConfig.shouldShowTapIndicators else { return }
+        
         let indicator = SKShapeNode(circleOfRadius: 8)
         indicator.fillColor = success ? .green : .red
         indicator.strokeColor = .white

@@ -163,8 +163,6 @@ class PetData {
         // Update emotion based on streak
         updateEmotion()
         
-        // Check for stage evolution
-        checkStageEvolution()
     }
     
     func calculateEvoPoints() -> Int {
@@ -315,30 +313,31 @@ class PetData {
         return false
     }
     
-    /// Check if the pet should evolve and update its stage
-    private func checkStageEvolution() {
-        // Don't evolve if pet is dead
-        if isDead { return }
-        
-        // Check if ready to evolve and update stage accordingly
-        if isReadyToEvolve() {
-            switch stage {
-            case .egg:
-                stage = .baby
-            case .baby:
-                stage = .child
-            case .child:
-                stage = .teen
-            case .teen:
-                stage = .adult
-            case .adult:
-                stage = .elder
-            case .elder:
-                // Already at max stage
-                break
-            }
-        }
-    }
+//    Commented out as I honestly don't know what this is for - Alif
+//    private func checkStageEvolution() {
+//        // Don't evolve if pet is dead
+//        if isDead { return }
+//        
+//        // Check if ready to evolve and update stage accordingly
+//        // Commented out for now to avoid evolving automatically
+//        // if isReadyToEvolve() {
+//        //     switch stage {
+//        //     case .egg:
+//        //         stage = .baby
+//        //     case .baby:
+//        //         stage = .child
+//        //     case .child:
+//        //         stage = .teen
+//        //     case .teen:
+//        //         stage = .adult
+//        //     case .adult:
+//        //         stage = .elder
+//        //     case .elder:
+//        //         // Already at max stage
+//        //         break
+//        //     }
+//        // }
+//    }
     
     // MARK: - Development/Testing Methods
     
@@ -374,15 +373,15 @@ class PetData {
             age = max(age, 501)
         case .elder:
             // Already at max stage, do nothing
-            print("🦴 Pet is already at elder stage (max)")
+            DebugConfig.debugPrint("🦴 Pet is already at elder stage (max)")
             return
         }
         
         // Update emotion based on current streak
         updateEmotion()
         
-        print("🚀 Force evolved from \(previousStage.displayName) to \(stage.displayName)")
-        print("📅 Age set to: \(age)")
+        DebugConfig.debugPrint("🚀 Force evolved from \(previousStage.displayName) to \(stage.displayName)")
+        DebugConfig.debugPrint("📅 Age set to: \(age)")
     }
 }
 

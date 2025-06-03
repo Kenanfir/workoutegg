@@ -17,7 +17,7 @@ struct StatusView: View {
             HStack {
                 Spacer()
                 Text("STATUS")
-                    .font(.system(size: 16, weight: .bold, design: .monospaced))
+                    .font(.custom("VCR_OSD_MONO", size: 16))
                     .foregroundColor(.white)
                 Spacer()
             }
@@ -35,7 +35,7 @@ struct StatusView: View {
                 // Emotion with color indicator
                 HStack {
                     Text("EMOTION")
-                        .font(.system(size: 12, weight: .bold, design: .monospaced))
+                        .font(.custom("VCR_OSD_MONO", size: 12))
                         .foregroundColor(.white)
                         .frame(width: 80, alignment: .leading)
                     
@@ -47,7 +47,7 @@ struct StatusView: View {
                             .frame(width: 8, height: 8)
                         
                         Text(petData.emotion.displayName)
-                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                            .font(.custom("VCR_OSD_MONO", size: 12))
                             .foregroundColor(.white)
                     }
                 }
@@ -74,7 +74,7 @@ struct StatusRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.system(size: 12, weight: .bold, design: .monospaced))
+                .font(.custom("VCR_OSD_MONO", size: 12))
                 .foregroundColor(.white)
                 .frame(width: 80, alignment: .leading)
             
@@ -82,7 +82,7 @@ struct StatusRow: View {
             
             if !value.isEmpty {
                 Text(value)
-                    .font(.system(size: 12, weight: .bold, design: .monospaced))
+                    .font(.custom("VCR_OSD_MONO", size: 12))
                     .foregroundColor(.white)
             }
         }
@@ -94,83 +94,80 @@ struct ScrollableStatusView: View {
     @Bindable var currentPet: PetData
     let longestLivedPet: LongestLivedPetData?
     
+    @State private var showScrollHint: Bool = true
+    
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: 20) {
+            VStack(spacing: 16) {
                 // Current Pet Status
                 StatusView(petData: currentPet)
                 
-                // Longest Lived Pet
+                // Longest Lived Pet Card (compact, like the image)
                 if let longestPet = longestLivedPet {
-                    LongestLivedPetCard(petData: longestPet)
+                    LongestLivedPetCardCompact(petData: longestPet)
+                } else {
+                    LongestLivedPetCardCompact(
+                        petData: LongestLivedPetData(
+                            age: 0,
+                            species: .fufufafa,
+                            stage: .egg,
+                            emotion: .content,
+                            totalCaloriesConsumed: 0,
+                            finalStreak: 0,
+                            createdDate: Date(),
+                            diedDate: Date(),
+                            causeOfDeath: ""
+                        )
+                    )
                 }
                 
                 // Add some bottom padding for scrolling
-                Color.clear.frame(height: 20)
+                Color.clear.frame(height: 24)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 20)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 12)
         }
     }
 }
 
-struct LongestLivedPetCard: View {
+struct LongestLivedPetCardCompact: View {
     let petData: LongestLivedPetData
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Title Header
-            HStack {
-                Spacer()
-                Text("LONGEST LIVED")
-                    .font(.system(size: 16, weight: .bold, design: .monospaced))
-                    .foregroundColor(.white)
-                Spacer()
-            }
-            .padding(.vertical, 12)
-            .background(Color.black.opacity(0.8))
-            .cornerRadius(8, corners: [.topLeft, .topRight])
-            
-            // Pet Content with Image
-            VStack(spacing: 16) {
-                // Pet Stats
-                VStack(alignment: .leading, spacing: 8) {
-                    StatusRow(label: "LONGEST", value: petData.ageInDays)
-                    StatusRow(label: "LIVED", value: "")
-                    StatusRow(label: "SPECIES", value: petData.species.displayName)
-                    StatusRow(label: "STAGE", value: "\(petData.stage.rawValue)")
-                    StatusRow(label: "TOTAL", value: petData.totalCaloriesString)
+        ZStack {
+            // Background
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.black.opacity(0.25))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                )
+            VStack(spacing: 0) {
+                HStack {
+                    Text("LONGEST\nLIVED")
+                        .font(.custom("VCR_OSD_MONO", size: 16))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Text(petData.ageInDays)
+                        .font(.custom("VCR_OSD_MONO", size: 16))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 12)
+                .padding(.top, 10)
+                .padding(.bottom, 2)
                 
-                // Pet Image
                 if !petData.petImageName.isEmpty {
                     Image(petData.petImageName)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 80, height: 80)
-                        .background(Color.white.opacity(0.1))
-                        .cornerRadius(8)
-                }
-                
-                // Cause of death (optional)
-                if !petData.causeOfDeath.isEmpty && petData.causeOfDeath != "unknown" {
-                    Text("Cause: \(petData.causeOfDeath.replacingOccurrences(of: "_", with: " ").capitalized)")
-                        .font(.system(size: 10, weight: .medium, design: .monospaced))
-                        .foregroundColor(.white.opacity(0.7))
-                        .padding(.horizontal, 16)
+                        .frame(height: 80)
+                        .padding(.vertical, 4)
                 }
             }
-            .padding(.vertical, 16)
-            .background(Color.black.opacity(0.7))
-            .cornerRadius(8, corners: [.bottomLeft, .bottomRight])
         }
-        .background(Color.black.opacity(0.1))
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.white.opacity(0.2), lineWidth: 1)
-        )
+        .frame(maxWidth: .infinity, minHeight: 120)
     }
 }
 

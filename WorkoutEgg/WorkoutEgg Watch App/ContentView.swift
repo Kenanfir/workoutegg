@@ -121,6 +121,11 @@ struct ContentView: View {
     @Environment(\.modelContext) private var context
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     
+    // PetManager for fetching pets
+    private var petManager: PetManager {
+        PetManager(context: context)
+    }
+    
     // Get the current pet (or create one if none exists)
     private var currentPet: PetData {
         if let pet = pets.first {
@@ -131,6 +136,11 @@ struct ContentView: View {
             try? context.save()
             return newPet
         }
+    }
+    
+    // Fetch the longest lived pet
+    private var longestLivedPet: LongestLivedPetData? {
+        petManager.getLongestLivedPet()
     }
     
     @State private var selectedTab = 1
@@ -154,8 +164,8 @@ struct ContentView: View {
                 OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
             } else {
                 TabView(selection: $selectedTab) {
-                    // Status View (Left)
-                    StatusView(petData: currentPet)
+                    // Status View (Left) - now scrollable
+                    ScrollableStatusView(currentPet: currentPet, longestLivedPet: longestLivedPet)
                         .tag(0)
                     
                     // Egg Scene View (Middle - Main Screen)

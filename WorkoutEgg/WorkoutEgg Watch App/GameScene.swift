@@ -13,6 +13,9 @@ class GameScene: SKScene {
     // Debug flag to show hit area
     let showHitArea = false
     
+    // Pet data reference
+    private var petData: PetData?
+    
     override func sceneDidLoad() {
         print("Scene did load") // Debug print
         // ngefix background X
@@ -32,52 +35,73 @@ class GameScene: SKScene {
         isUserInteractionEnabled = true
         scaleMode = .aspectFit // Make the scene fill the entire screen
         anchorPoint = CGPoint(x: 0.5, y: 0.5) // Set anchor point to center
-        setupEgg()
+        setupPet()
     }
     
-    private func setupEgg() {
-        print("Setting up egg") // Debug print
-        // Create the egg sprite
-        let egg = SKSpriteNode(imageNamed: "Egg/egg-2-wo-normal")
+    /// Set the pet data reference and update the display
+    func setPetData(_ petData: PetData) {
+        self.petData = petData
+        updatePetDisplay()
+    }
+    
+    /// Update the pet display when stage or species changes
+    func updatePetDisplay() {
+        guard let petData = self.petData else { return }
+        
+        // Remove existing pet sprite
+        childNode(withName: "pet")?.removeFromParent()
+        
+        // Create new pet sprite with current image
+        setupPet()
+    }
+    
+    private func setupPet() {
+        print("Setting up pet") // Debug print
+        
+        // Get the current pet image name, fallback to egg if no pet data
+        let imageName = petData?.petImageName ?? "Egg/egg-2-wo-normal"
+        
+        // Create the pet sprite
+        let pet = SKSpriteNode(imageNamed: imageName)
         
         // Debug print to check if image was loaded
-        if egg.texture == nil {
-            print("Failed to load egg image")
+        if pet.texture == nil {
+            print("Failed to load pet image: \(imageName)")
         } else {
-            print("Egg image loaded successfully")
-            print("Egg size: \(egg.size)")
+            print("Pet image loaded successfully: \(imageName)")
+            print("Pet size: \(pet.size)")
         }
         
         // Keep original size but scale it down to fit
-        let scale: CGFloat = 0.6 // Scale down to half size
-        egg.size = CGSize(width: egg.size.width * scale, height: egg.size.height * scale)
+        let scale: CGFloat = 0.6 // Scale down to fit
+        pet.size = CGSize(width: pet.size.width * scale, height: pet.size.height * scale)
         
         // Set the anchor point to the bottom center
-        egg.anchorPoint = CGPoint(x: 0.5, y: 0.0)
+        pet.anchorPoint = CGPoint(x: 0.5, y: 0.0)
         
-        // Position the egg at the center (0,0 since we set anchorPoint to center)
-        egg.position = CGPoint(x: 0, y: -15) // Moved up by 50 points
-        print("Egg position: \(egg.position)") // Debug print
+        // Position the pet at the center (0,0 since we set anchorPoint to center)
+        pet.position = CGPoint(x: 0, y: -15) // Moved up by 50 points
+        print("Pet position: \(pet.position)") // Debug print
         print("Scene frame: \(frame)") // Debug print
         
-        // Name
-        egg.name = "egg"
+        // Name (changed from "egg" to "pet" to be more generic)
+        pet.name = "pet"
         
-        // Add the egg to the scene
-        addChild(egg)
+        // Add the pet to the scene
+        addChild(pet)
         
         // Visualize the hit area if debug flag is enabled
         if showHitArea {
-            let hitAreaNode = SKShapeNode(rect: egg.frame)
+            let hitAreaNode = SKShapeNode(rect: pet.frame)
             hitAreaNode.strokeColor = .green
             hitAreaNode.lineWidth = 0.5
             hitAreaNode.alpha = 0.4
             addChild(hitAreaNode)
-            print("Added hit area visualization: \(egg.frame)")
+            print("Added hit area visualization: \(pet.frame)")
         }
     }
     
-    func wiggleEgg(_ egg: SKSpriteNode) {
+    func wigglePet(_ pet: SKSpriteNode) {
         // Create a sequence of actions for the wiggle
         let rotateRight = SKAction.rotate(toAngle: .pi / 20, duration: 0.2)
         let rotateLeft = SKAction.rotate(toAngle: -.pi / 20, duration: 0.2)
@@ -89,27 +113,27 @@ class GameScene: SKScene {
         let fullAnimation = SKAction.sequence([repeatWiggle, returnToCenter])
         
         // Run the animation
-        egg.run(fullAnimation)
+        pet.run(fullAnimation)
     }
     
     // Method to handle tap points from SwiftUI
     func onTap(_ point: CGPoint) {
         print("Received tap at: \(point)") // Debug tap position
         
-        if let egg = childNode(withName: "egg") as? SKSpriteNode {
-            let eggFrame = egg.frame
-            print("Egg position: \(egg.position), frame: \(eggFrame)")
+        if let pet = childNode(withName: "pet") as? SKSpriteNode {
+            let petFrame = pet.frame
+            print("Pet position: \(pet.position), frame: \(petFrame)")
             
             // Create visual indicators
             let marker = SKShapeNode(circleOfRadius: 3)
             
-            // Use the exact egg frame for hit detection
-            if eggFrame.contains(point) {
-                print("Egg tapped!")
+            // Use the exact pet frame for hit detection
+            if petFrame.contains(point) {
+                print("Pet tapped!")
                 marker.fillColor = .green // Green for successful tap
-                wiggleEgg(egg)
+                wigglePet(pet)
             } else {
-                print("Tap missed egg. Distance from egg center: \(distance(from: point, to: egg.position))")
+                print("Tap missed pet. Distance from pet center: \(distance(from: point, to: pet.position))")
                 marker.fillColor = .red // Red for missed tap
             }
             

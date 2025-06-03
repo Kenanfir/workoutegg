@@ -22,7 +22,7 @@ struct StatusView: View {
                 Spacer()
             }
             .padding(.vertical, 12)
-            .background(Color.black.opacity(0.8))
+            .background(Color.white.opacity(0.18))
             .cornerRadius(8, corners: [.topLeft, .topRight])
             
             // Status Content
@@ -55,10 +55,10 @@ struct StatusView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .background(Color.black.opacity(0.7))
+            .background(Color.white.opacity(0.12))
             .cornerRadius(8, corners: [.bottomLeft, .bottomRight])
         }
-        .background(Color.black.opacity(0.1))
+        .background(Color.white.opacity(0.08))
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
@@ -97,35 +97,41 @@ struct ScrollableStatusView: View {
     @State private var showScrollHint: Bool = true
     
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: 16) {
-                // Current Pet Status
-                StatusView(petData: currentPet)
-                
-                // Longest Lived Pet Card (compact, like the image)
-                if let longestPet = longestLivedPet {
-                    LongestLivedPetCardCompact(petData: longestPet)
-                } else {
-                    LongestLivedPetCardCompact(
-                        petData: LongestLivedPetData(
-                            age: 0,
-                            species: .fufufafa,
-                            stage: .egg,
-                            emotion: .content,
-                            totalCaloriesConsumed: 0,
-                            finalStreak: 0,
-                            createdDate: Date(),
-                            diedDate: Date(),
-                            causeOfDeath: ""
+        ZStack {
+            Image("background/bg-field")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: 16) {
+                    // Current Pet Status
+                    StatusView(petData: currentPet)
+                    
+                    // Longest Lived Pet Card (compact, like the image)
+                    if let longestPet = longestLivedPet {
+                        LongestLivedPetCardCompact(petData: longestPet)
+                    } else {
+                        LongestLivedPetCardCompact(
+                            petData: LongestLivedPetData(
+                                age: 0,
+                                species: .fufufafa,
+                                stage: .egg,
+                                emotion: .content,
+                                totalCaloriesConsumed: 0,
+                                finalStreak: 0,
+                                createdDate: Date(),
+                                diedDate: Date(),
+                                causeOfDeath: ""
+                            )
                         )
-                    )
+                    }
+                    
+                    // Add some bottom padding for scrolling
+                    Color.clear.frame(height: 24)
                 }
-                
-                // Add some bottom padding for scrolling
-                Color.clear.frame(height: 24)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 12)
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 12)
         }
     }
 }
@@ -137,7 +143,7 @@ struct LongestLivedPetCardCompact: View {
         ZStack {
             // Background
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.black.opacity(0.25))
+                .fill(Color.white.opacity(0.18))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(Color.white.opacity(0.2), lineWidth: 1)

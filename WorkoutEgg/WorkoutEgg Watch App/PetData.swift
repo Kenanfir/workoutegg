@@ -71,6 +71,7 @@ enum PetStage: Int, CaseIterable, Codable {
 class PetData {
     var age: Int
     var streak: Int
+    var evoPoints: Int
     var species: PetSpecies
     var stage: PetStage
     var emotion: PetEmotion
@@ -118,13 +119,14 @@ class PetData {
         }
     }
     
-    init(age: Int = 0, streak: Int = 0, species: PetSpecies = .fufufafa,
+    init(age: Int = 0, streak: Int = 0, evoPoints: Int = 0, species: PetSpecies = .fufufafa,
          stage: PetStage = .egg, emotion: PetEmotion = .content, lastFedDate: Date = Date(),
          cumulativeCalories: Double = 0, lastCalorieResetDate: Date = Date(),
          totalCaloriesConsumed: Double = 0, isActive: Bool = true, createdDate: Date = Date(),
          isDead: Bool = false, missedDaysCount: Int = 0) {
         self.age = age
         self.streak = streak
+        self.evoPoints = evoPoints
         self.species = species
         self.stage = stage
         self.emotion = emotion
@@ -140,16 +142,27 @@ class PetData {
     }
     
     func updateAfterFed() {
-        streak += 1
-        age += 1
-        lastFedDate = Date()
-        missedDaysCount = 0 // Reset missed days when fed
+        
+        if lastFedDate != Date(){
+            streak += 1
+            age += 1
+            lastFedDate = Date()
+            missedDaysCount = 0
+        }
         
         // Update emotion based on streak
         updateEmotion()
         
         // Check for stage evolution
         checkStageEvolution()
+    }
+    
+    func calculateEvoPoints() -> Int {
+        return 0
+    }
+    
+    func checkFoodStage() -> Int {
+        return 0
     }
     
     func addCaloriesConsumed(_ calories: Double) {
@@ -249,21 +262,33 @@ class PetData {
         }
     }
     
-    private func checkStageEvolution() {
-        switch age {
-        case 0...10:
-            stage = .egg
-        case 11...50:
-            stage = .baby
-        case 51...150:
-            stage = .child
-        case 151...300:
-            stage = .teen
-        case 301...500:
-            stage = .adult
-        default:
-            stage = .elder
+    private func checkStageEvolution() -> Bool {
+        
+        switch stage {
+        case .egg:
+            if cumulativeCalories >= 200 {
+                return true
+            }
+        case .baby:
+            if age >= 10 {
+                return true
+            }
+        case .child:
+            if age >= 30{
+                return true
+            }
+        case .teen:
+            if age >= 60{
+                return true
+            }
+        case .adult:
+            if age >= 100 {
+                return true
+            }
+        case .elder:
+            break
         }
+        return false
     }
     
     // MARK: - Development/Testing Methods
@@ -277,15 +302,15 @@ class PetData {
         // Set age to minimum required for next stage
         switch stage {
         case .egg:
-            age = 11 // Minimum for baby stage
+            stage = .baby
         case .baby:
-            age = 51 // Minimum for child stage
+            stage = .child
         case .child:
-            age = 151 // Minimum for teen stage
+            stage = .teen
         case .teen:
-            age = 301 // Minimum for adult stage
+            stage = .adult
         case .adult:
-            age = 501 // Minimum for elder stage
+            stage = .elder
         case .elder:
             // Already at max stage, do nothing
             return

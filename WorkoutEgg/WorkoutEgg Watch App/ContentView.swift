@@ -258,7 +258,7 @@ struct ContentView: View {
             progressScene.setPetData(currentPet)
             
             // Check for missed workouts when app opens
-            currentPet.checkMissedFed()
+            petmanager.checkPetHealth()
         }
         .onChange(of: currentPet.stage) { oldValue, newValue in
             // Update GameScene when pet stage changes

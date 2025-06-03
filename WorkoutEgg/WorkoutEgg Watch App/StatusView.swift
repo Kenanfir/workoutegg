@@ -17,7 +17,7 @@ struct StatusView: View {
             HStack {
                 Spacer()
                 Text("STATUS")
-                    .font(.custom("VCR_OSD_MONO", size: 14))
+                    .font(.custom("VCROSDMono", size: 14))
                     .foregroundColor(.white)
                 Spacer()
             }
@@ -54,7 +54,7 @@ struct StatusRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.custom("VCR_OSD_MONO", size: 9))
+                .font(.custom("VCROSDMono", size: 9))
                 .foregroundColor(.white)
                 .frame(width: 80, alignment: .leading)
             
@@ -62,7 +62,7 @@ struct StatusRow: View {
             
             if !value.isEmpty {
                 Text(value)
-                    .font(.custom("VCR_OSD_MONO", size: 9))
+                    .font(.custom("VCROSDMono", size: 9))
                     .foregroundColor(.white)
             }
         }
@@ -131,12 +131,12 @@ struct LongestLivedPetCardCompact: View {
             VStack(spacing: 0) {
                 HStack {
                     Text("LONGEST\nLIVED")
-                        .font(.custom("VCR_OSD_MONO", size: 12))
+                        .font(.custom("VCROSDMono", size: 12))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.leading)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Text(petData.ageInDays)
-                        .font(.custom("VCR_OSD_MONO", size: 12))
+                        .font(.custom("VCROSDMono", size: 12))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity, alignment: .trailing)
                 }

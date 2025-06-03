@@ -17,12 +17,12 @@ struct StatusView: View {
             HStack {
                 Spacer()
                 Text("STATUS")
-                    .font(.custom("VCR_OSD_MONO", size: 16))
+                    .font(.custom("VCR_OSD_MONO", size: 14))
                     .foregroundColor(.white)
                 Spacer()
             }
-            .padding(.vertical, 12)
-            .background(Color.white.opacity(0.18))
+            .padding(.vertical, 8)
+            .background(Color.black.opacity(0.18))
             .cornerRadius(8, corners: [.topLeft, .topRight])
             
             // Status Content
@@ -31,34 +31,14 @@ struct StatusView: View {
                 StatusRow(label: "TOTAL", value: petData.totalCaloriesString)
                 StatusRow(label: "SPECIES", value: petData.species.displayName)
                 StatusRow(label: "STAGE", value: "\(petData.stage.rawValue)")
-                
-                // Emotion with color indicator
-                HStack {
-                    Text("EMOTION")
-                        .font(.custom("VCR_OSD_MONO", size: 12))
-                        .foregroundColor(.white)
-                        .frame(width: 80, alignment: .leading)
-                    
-                    Spacer()
-                    
-                    HStack(spacing: 6) {
-                        Circle()
-                            .fill(petData.emotion.color)
-                            .frame(width: 8, height: 8)
-                        
-                        Text(petData.emotion.displayName)
-                            .font(.custom("VCR_OSD_MONO", size: 12))
-                            .foregroundColor(.white)
-                    }
-                }
-                .padding(.vertical, 4)
+                StatusRow(label: "EMOTION", value: petData.emotion.displayName)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .background(Color.white.opacity(0.12))
+            .background(Color.black.opacity(0.12))
             .cornerRadius(8, corners: [.bottomLeft, .bottomRight])
         }
-        .background(Color.white.opacity(0.08))
+        .background(Color.black.opacity(0.08))
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
@@ -74,7 +54,7 @@ struct StatusRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.custom("VCR_OSD_MONO", size: 12))
+                .font(.custom("VCR_OSD_MONO", size: 9))
                 .foregroundColor(.white)
                 .frame(width: 80, alignment: .leading)
             
@@ -82,7 +62,7 @@ struct StatusRow: View {
             
             if !value.isEmpty {
                 Text(value)
-                    .font(.custom("VCR_OSD_MONO", size: 12))
+                    .font(.custom("VCR_OSD_MONO", size: 9))
                     .foregroundColor(.white)
             }
         }
@@ -143,7 +123,7 @@ struct LongestLivedPetCardCompact: View {
         ZStack {
             // Background
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white.opacity(0.18))
+                .fill(Color.black.opacity(0.18))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(Color.white.opacity(0.2), lineWidth: 1)
@@ -151,12 +131,12 @@ struct LongestLivedPetCardCompact: View {
             VStack(spacing: 0) {
                 HStack {
                     Text("LONGEST\nLIVED")
-                        .font(.custom("VCR_OSD_MONO", size: 16))
+                        .font(.custom("VCR_OSD_MONO", size: 12))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.leading)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Text(petData.ageInDays)
-                        .font(.custom("VCR_OSD_MONO", size: 16))
+                        .font(.custom("VCR_OSD_MONO", size: 12))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity, alignment: .trailing)
                 }

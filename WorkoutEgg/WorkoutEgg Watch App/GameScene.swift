@@ -7,11 +7,16 @@
 
 import SpriteKit
 import WatchKit
+import SwiftData
 
 class GameScene: SKScene {
     
     // Pet data reference
     private var petData: PetData?
+    
+    // Evolution button
+    private var evolutionButton: SKSpriteNode?
+    private var evolutionLabel: SKLabelNode?
     
     override func sceneDidLoad() {
         DebugConfig.debugPrint("Scene did load")
@@ -33,12 +38,14 @@ class GameScene: SKScene {
         scaleMode = .aspectFit // Make the scene fill the entire screen
         anchorPoint = CGPoint(x: 0.5, y: 0.5) // Set anchor point to center
         setupPet()
+        setupEvolutionButton()
     }
     
     /// Set the pet data reference and update the display
     func setPetData(_ petData: PetData) {
         self.petData = petData
         updatePetDisplay()
+        updateEvolutionButton()
     }
     
     /// Update the pet display when stage or species changes
@@ -50,6 +57,9 @@ class GameScene: SKScene {
         
         // Create new pet sprite with current image
         setupPet()
+        
+        // Update evolution button visibility
+        updateEvolutionButton()
     }
     
     private func setupPet() {
@@ -98,6 +108,41 @@ class GameScene: SKScene {
         }
     }
     
+    private func setupEvolutionButton() {
+        // Create evolution button background
+        evolutionButton = SKSpriteNode(color: .green, size: CGSize(width: 60, height: 20))
+        evolutionButton!.position = CGPoint(x: 0, y: 30)
+        evolutionButton!.zPosition = 10
+        evolutionButton!.name = "evolution_button"
+        
+        // Create evolution button label
+        evolutionLabel = SKLabelNode(fontNamed: "VCROSDMono")
+        evolutionLabel!.text = "EVOLVE!"
+        evolutionLabel!.fontSize = 8
+        evolutionLabel!.fontColor = .white
+        evolutionLabel!.position = CGPoint(x: 0, y: -3) // Slightly offset for centering
+        evolutionLabel!.zPosition = 11
+        evolutionLabel!.name = "evolution_label"
+        
+        evolutionButton!.addChild(evolutionLabel!)
+        addChild(evolutionButton!)
+        
+        // Initially hide the button
+        evolutionButton!.isHidden = true
+        
+        DebugConfig.debugPrint("Evolution button created and hidden")
+    }
+    
+    private func updateEvolutionButton() {
+        guard let petData = self.petData,
+              let button = evolutionButton else { return }
+        
+        let shouldShow = petData.isReadyToEvolve() && !petData.isDead
+        button.isHidden = !shouldShow
+        
+        DebugConfig.debugPrint("Evolution button visibility: \(shouldShow ? "visible" : "hidden")")
+    }
+    
     func wigglePet(_ pet: SKSpriteNode) {
         // Create a sequence of actions for the wiggle
         let rotateRight = SKAction.rotate(toAngle: .pi / 20, duration: 0.2)
@@ -117,45 +162,126 @@ class GameScene: SKScene {
     func onTap(_ point: CGPoint) {
         DebugConfig.debugPrint("Received tap at: \(point)")
         
-        if let pet = childNode(withName: "pet") as? SKSpriteNode {
-            let petFrame = pet.frame
-            DebugConfig.debugPrint("Pet position: \(pet.position), frame: \(petFrame)")
+        // Check if evolution button was tapped
+        if let button = evolutionButton,
+           !button.isHidden,
+           button.contains(point) {
+            handleEvolutionButtonTap()
+            return
+        }
+        
+        // Check if pet was tapped
+        if let pet = childNode(withName: "pet") as? SKSpriteNode,
+           pet.contains(point) {
+            handlePetTap(pet, at: point)
+            return
+        }
+        
+        // Show miss indicator if nothing was tapped
+        showTapIndicator(at: point, success: false)
+    }
+    
+    private func handleEvolutionButtonTap() {
+        guard let petData = self.petData else { return }
+        
+        DebugConfig.debugPrint("🌟 Evolution button tapped!")
+        
+        if petData.tryNaturalEvolution() {
+            // Evolution successful
+            DebugConfig.debugPrint("✅ Evolution successful!")
             
-            // Create visual indicators
-            let marker = SKShapeNode(circleOfRadius: 3)
+            // Update the pet display
+            updatePetDisplay()
             
-            // Use the exact pet frame for hit detection
-            if petFrame.contains(point) {
-                DebugConfig.debugPrint("Pet tapped!")
-                marker.fillColor = .green // Green for successful tap
-                wigglePet(pet)
-                
-                // GameScene only provides visual feedback - no feeding!
-                // Feeding is exclusively handled by ProgressScene when tapping food items
-                DebugConfig.debugPrint("🎮 GameScene: Pet interaction complete (visual only)")
-            } else {
-                DebugConfig.debugPrint("Tap missed pet. Distance from pet center: \(distance(from: point, to: pet.position))")
-                marker.fillColor = .red // Red for missed tap
-            }
+            // Add evolution effect
+            showEvolutionEffect()
             
-            // Show tap position marker only in debug mode
-            if DebugConfig.shouldShowTapIndicators {
-                marker.position = point
-                marker.alpha = 0.6
-                addChild(marker)
-                
-                // Remove marker after a delay
-                let fadeOut = SKAction.fadeOut(withDuration: 0.5)
-                let remove = SKAction.removeFromParent()
-                marker.run(SKAction.sequence([SKAction.wait(forDuration: 1.0), fadeOut, remove]))
-            }
+            // Notify observers (ContentView) about the evolution
+            NotificationCenter.default.post(name: .petEvolved, object: petData)
+        } else {
+            DebugConfig.debugPrint("❌ Evolution failed - requirements not met")
+            showTapIndicator(at: evolutionButton!.position, success: false)
         }
     }
     
-    // Helper to calculate distance between points
-    private func distance(from point1: CGPoint, to point2: CGPoint) -> CGFloat {
-        let dx = point1.x - point2.x
-        let dy = point1.y - point2.y
-        return sqrt(dx*dx + dy*dy)
+    private func handlePetTap(_ pet: SKSpriteNode, at location: CGPoint) {
+        guard let petData = self.petData else { return }
+        
+        // Don't allow feeding if pet is dead
+        if petData.isDead {
+            showTapIndicator(at: location, success: false)
+            return
+        }
+        
+        // Call the feeding method
+        petData.updateAfterFed()
+        
+        // Show success indicator
+        showTapIndicator(at: location, success: true)
+        
+        // Wiggle the pet
+        wigglePet(pet)
+        
+        // Update evolution button in case pet became ready to evolve
+        updateEvolutionButton()
+        
+        DebugConfig.debugPrint("🍎 Pet fed! Age: \(petData.age), Streak: \(petData.streak)")
     }
+    
+    private func showEvolutionEffect() {
+        // Create sparkle effect at pet position
+        let sparkle = SKSpriteNode(color: .yellow, size: CGSize(width: 5, height: 5))
+        sparkle.position = CGPoint(x: 0, y: 0)
+        sparkle.zPosition = 15
+        
+        let scaleUp = SKAction.scale(to: 3.0, duration: 0.3)
+        let fadeOut = SKAction.fadeOut(withDuration: 0.3)
+        let remove = SKAction.removeFromParent()
+        
+        let sequence = SKAction.sequence([
+            SKAction.group([scaleUp, fadeOut]),
+            remove
+        ])
+        
+        sparkle.run(sequence)
+        addChild(sparkle)
+        
+        DebugConfig.debugPrint("✨ Evolution effect played")
+    }
+    
+    private func showTapIndicator(at location: CGPoint, success: Bool) {
+        // Only show tap indicators in debug mode
+        guard DebugConfig.shouldShowTapIndicators else { return }
+        
+        let indicator = SKShapeNode(circleOfRadius: 4)
+        indicator.fillColor = success ? .green : .red
+        indicator.strokeColor = .white
+        indicator.lineWidth = 1
+        indicator.position = location
+        indicator.alpha = 0.8
+        indicator.zPosition = 100
+        
+        addChild(indicator)
+        
+        // Animate the indicator
+        let scaleUp = SKAction.scale(to: 1.5, duration: 0.1)
+        let scaleDown = SKAction.scale(to: 0.5, duration: 0.1)
+        let fadeOut = SKAction.fadeOut(withDuration: 0.3)
+        let remove = SKAction.removeFromParent()
+        
+        let sequence = SKAction.sequence([
+            scaleUp,
+            scaleDown,
+            SKAction.wait(forDuration: 0.2),
+            fadeOut,
+            remove
+        ])
+        
+        indicator.run(sequence)
+    }
+}
+
+// Extension for notification handling
+extension Notification.Name {
+    static let petEvolved = Notification.Name("petEvolved")
 }

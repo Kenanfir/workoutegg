@@ -26,8 +26,8 @@ class HealthKitManager: ObservableObject {
     }
     
     private func setupPeriodicUpdates() {
-        // Update every 5 seconds while the app is active
-        updateTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+        // Update every 5 minutes while the app is active
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
             self?.fetchTodayCalories()
         }
     }
@@ -133,23 +133,53 @@ class HealthKitManager: ObservableObject {
     // New method to fetch calories for multiple days (for egg stage)
     func fetchCaloriesSinceDate(_ startDate: Date) {
         guard let activeEnergyType = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned) else {
+            DebugConfig.debugPrint("❌ HealthKit: Failed to get activeEnergyBurned type for cumulative query")
             return
         }
         
         let now = Date()
         let predicate = HKQuery.predicateForSamples(withStart: startDate, end: now, options: .strictStartDate)
         
+        DebugConfig.debugPrint("📅 HealthKit Cumulative Query: \(startDate) to \(now)")
+        
         let query = HKStatisticsQuery(
             quantityType: activeEnergyType,
             quantitySamplePredicate: predicate,
             options: .cumulativeSum
         ) { _, result, error in
-            guard let result = result, let sum = result.sumQuantity() else {
+            if let error = error {
+                DebugConfig.debugPrint("❌ HealthKit Cumulative Query Error: \(error.localizedDescription)")
+                
+                // Fallback: If cumulative query fails, use today's calories for egg stage
+                DispatchQueue.main.async {
+                    DebugConfig.debugPrint("🔄 Fallback: Using today's calories (\(self.caloriesBurned)) for egg cumulative")
+                    self.cumulativeCalories = self.caloriesBurned
+                    self.petData?.updateCumulativeCalories(todayCalories: self.caloriesBurned, cumulativeCalories: self.caloriesBurned)
+                }
                 return
             }
             
+            guard let result = result, let sum = result.sumQuantity() else {
+                DebugConfig.debugPrint("⚠️ HealthKit Cumulative: No data or nil result")
+                
+                // Fallback: If no cumulative data available, use today's calories
+                DispatchQueue.main.async {
+                    DebugConfig.debugPrint("🔄 Fallback: No cumulative data, using today's calories (\(self.caloriesBurned))")
+                    self.cumulativeCalories = self.caloriesBurned
+                    self.petData?.updateCumulativeCalories(todayCalories: self.caloriesBurned, cumulativeCalories: self.caloriesBurned)
+                }
+                return
+            }
+            
+            let cumulativeCalories = sum.doubleValue(for: HKUnit.kilocalorie())
+            DebugConfig.debugPrint("✅ HealthKit: Fetched \(cumulativeCalories) cumulative calories since \(startDate)")
+            
             DispatchQueue.main.async {
-                self.cumulativeCalories = sum.doubleValue(for: HKUnit.kilocalorie())
+                self.cumulativeCalories = cumulativeCalories
+                DebugConfig.debugPrint("📱 HealthKit: Updated cumulativeCalories to \(self.cumulativeCalories)")
+                
+                // Update the pet data with both values
+                self.petData?.updateCumulativeCalories(todayCalories: self.caloriesBurned, cumulativeCalories: cumulativeCalories)
             }
         }
         
@@ -176,17 +206,31 @@ class HealthKitManager: ObservableObject {
             // For other stages, use only today's calories
             DebugConfig.debugPrint("   - Using non-egg mode, setting cumulative = burned")
             cumulativeCalories = caloriesBurned
+            
+            // Update the pet data with today's calories only
+            petData.updateCumulativeCalories(todayCalories: caloriesBurned)
         }
         
-        // Update the pet data
-        petData.updateCumulativeCalories(todayCalories: caloriesBurned)
-        DebugConfig.debugPrint("   - Called petData.updateCumulativeCalories with: \(caloriesBurned)")
+        DebugConfig.debugPrint("   - HealthKitManager cumulativeCalories: \(cumulativeCalories)")
     }
     
     private func getEggStartDate(petData: PetData) -> Date {
-        // Calculate when the pet became an egg based on age
-        let calendar = Calendar.current
-        let daysAsEgg = petData.age // Assuming age represents days as egg
-        return calendar.date(byAdding: .day, value: -daysAsEgg, to: Date()) ?? Date()
+        // Use the pet's actual creation date as the start date for cumulative calories
+        // This is more accurate than trying to calculate from age
+        let eggStartDate = petData.createdDate
+        
+        DebugConfig.debugPrint("🥚 Egg start date calculation:")
+        DebugConfig.debugPrint("   - Pet created: \(eggStartDate)")
+        DebugConfig.debugPrint("   - Pet age: \(petData.age)")
+        DebugConfig.debugPrint("   - Current date: \(Date())")
+        
+        // Ensure we don't query future dates
+        let now = Date()
+        if eggStartDate > now {
+            DebugConfig.debugPrint("   - WARNING: Creation date is in future, using current date")
+            return now
+        }
+        
+        return eggStartDate
     }
 }

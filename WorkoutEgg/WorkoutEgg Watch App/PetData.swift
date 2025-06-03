@@ -208,27 +208,50 @@ class PetData {
         return false
     }
     
-    func updateCumulativeCalories(todayCalories: Double) {
+    func updateCumulativeCalories(todayCalories: Double, cumulativeCalories: Double? = nil) {
         // Store the current day's calories
         self.currentDayCalories = todayCalories
         
         let calendar = Calendar.current
         let today = Date()
         
+        DebugConfig.debugPrint("🔄 PetData updateCumulativeCalories:")
+        DebugConfig.debugPrint("   - Stage: \(stage.displayName)")
+        DebugConfig.debugPrint("   - todayCalories: \(todayCalories)")
+        DebugConfig.debugPrint("   - cumulativeCalories param: \(cumulativeCalories ?? -1)")
+        DebugConfig.debugPrint("   - Current pet cumulativeCalories: \(self.cumulativeCalories)")
+        DebugConfig.debugPrint("   - Current totalCaloriesConsumed: \(self.totalCaloriesConsumed)")
+        
         if !calendar.isDate(lastCalorieResetDate, inSameDayAs: today) {
             if stage == .egg {
                 lastCalorieResetDate = today
             } else {
-                cumulativeCalories = 0
+                self.cumulativeCalories = 0
                 lastCalorieResetDate = today
             }
         }
         
         if stage == .egg {
-            cumulativeCalories = getCumulativeCaloriesSinceEgg() + todayCalories
+            // For egg stage, use the cumulative calories directly from HealthKit if provided
+            // BUT do NOT update totalCaloriesConsumed until the pet actually evolves
+            if let cumulativeCalories = cumulativeCalories {
+                self.cumulativeCalories = cumulativeCalories
+                DebugConfig.debugPrint("   - Egg stage: Using HealthKit cumulative calories: \(cumulativeCalories)")
+                DebugConfig.debugPrint("   - Egg stage: totalCaloriesConsumed remains at: \(self.totalCaloriesConsumed) (will update on evolution)")
+            } else {
+                // Fallback to previous logic if cumulative calories not provided
+                self.cumulativeCalories = getCumulativeCaloriesSinceEgg() + todayCalories
+                DebugConfig.debugPrint("   - Egg stage: Using fallback calculation: \(self.cumulativeCalories)")
+                DebugConfig.debugPrint("   - Egg stage: totalCaloriesConsumed remains at: \(self.totalCaloriesConsumed) (will update on evolution)")
+            }
         } else {
-            cumulativeCalories = todayCalories
+            // For other stages, use only today's calories
+            self.cumulativeCalories = todayCalories
+            DebugConfig.debugPrint("   - Non-egg stage: Using today's calories: \(todayCalories)")
         }
+        
+        DebugConfig.debugPrint("   - Final pet cumulativeCalories: \(self.cumulativeCalories)")
+        DebugConfig.debugPrint("   - Final totalCaloriesConsumed: \(self.totalCaloriesConsumed)")
     }
     
     private func getCumulativeCaloriesSinceEgg() -> Double {
@@ -284,60 +307,79 @@ class PetData {
         }
     }
     
-    private func isReadyToEvolve() -> Bool {
+    func isReadyToEvolve() -> Bool {
+        DebugConfig.debugPrint("🔍 Checking evolution readiness:")
+        DebugConfig.debugPrint("   - Current stage: \(stage.displayName)")
+        DebugConfig.debugPrint("   - Current age: \(age) days")
+        DebugConfig.debugPrint("   - Current cumulativeCalories: \(cumulativeCalories)")
         
         switch stage {
         case .egg:
-            if cumulativeCalories >= 200 {
-                return true
-            }
+            let readyToEvolve = cumulativeCalories >= 200
+            DebugConfig.debugPrint("   - Egg evolution check: \(cumulativeCalories) >= 200 = \(readyToEvolve)")
+            return readyToEvolve
         case .baby:
-            if age >= 10 {
-                return true
-            }
+            let readyToEvolve = age >= 7  // 7 days as baby
+            DebugConfig.debugPrint("   - Baby evolution check: \(age) >= 7 = \(readyToEvolve)")
+            return readyToEvolve
         case .child:
-            if age >= 30{
-                return true
-            }
+            let readyToEvolve = age >= 15  // 15 days total (8 more days as child)
+            DebugConfig.debugPrint("   - Child evolution check: \(age) >= 15 = \(readyToEvolve)")
+            return readyToEvolve
         case .teen:
-            if age >= 60{
-                return true
-            }
+            let readyToEvolve = age >= 25  // 25 days total (10 more days as teen)
+            DebugConfig.debugPrint("   - Teen evolution check: \(age) >= 25 = \(readyToEvolve)")
+            return readyToEvolve
         case .adult:
-            if age >= 100 {
-                return true
-            }
+            let readyToEvolve = age >= 40  // 40 days total (15 more days as adult)
+            DebugConfig.debugPrint("   - Adult evolution check: \(age) >= 40 = \(readyToEvolve)")
+            return readyToEvolve
         case .elder:
+            DebugConfig.debugPrint("   - Elder stage: cannot evolve further")
             break
         }
         return false
     }
     
-//    Commented out as I honestly don't know what this is for - Alif
-//    private func checkStageEvolution() {
-//        // Don't evolve if pet is dead
-//        if isDead { return }
-//        
-//        // Check if ready to evolve and update stage accordingly
-//        // Commented out for now to avoid evolving automatically
-//        // if isReadyToEvolve() {
-//        //     switch stage {
-//        //     case .egg:
-//        //         stage = .baby
-//        //     case .baby:
-//        //         stage = .child
-//        //     case .child:
-//        //         stage = .teen
-//        //     case .teen:
-//        //         stage = .adult
-//        //     case .adult:
-//        //         stage = .elder
-//        //     case .elder:
-//        //         // Already at max stage
-//        //         break
-//        //     }
-//        // }
-//    }
+    // MARK: - Evolution Methods
+    
+    /// Attempts to evolve the pet naturally based on current requirements
+    /// Returns true if evolution occurred, false if requirements not met
+    func tryNaturalEvolution() -> Bool {
+        guard !isDead else { return false }
+        guard isReadyToEvolve() else { return false }
+        
+        let previousStage = stage
+        let previousCumulativeCalories = cumulativeCalories
+        
+        // Perform the evolution
+        switch stage {
+        case .egg:
+            stage = .baby
+            // Transfer accumulated calories to totalCaloriesConsumed when hatching
+            totalCaloriesConsumed += cumulativeCalories
+            DebugConfig.debugPrint("🥚➡️🐣 Egg hatched! Transferred \(cumulativeCalories) calories to totalCaloriesConsumed")
+        case .baby:
+            stage = .child
+        case .child:
+            stage = .teen
+        case .teen:
+            stage = .adult
+        case .adult:
+            stage = .elder
+        case .elder:
+            return false // Already at max stage
+        }
+        
+        // Update emotion based on current streak
+        updateEmotion()
+        
+        DebugConfig.debugPrint("🌟 Natural evolution: \(previousStage.displayName) → \(stage.displayName)")
+        DebugConfig.debugPrint("📅 Age remains: \(age) days (actual days alive)")
+        DebugConfig.debugPrint("🔥 Total calories consumed: \(totalCaloriesConsumed)")
+        
+        return true
+    }
     
     // MARK: - Development/Testing Methods
     
@@ -348,29 +390,23 @@ class PetData {
         if isDead { return }
         
         let previousStage = stage
+        let previousCumulativeCalories = cumulativeCalories
         
         // Force evolution to next stage (bypassing normal requirements)
         switch stage {
         case .egg:
             stage = .baby
-            // Set minimum age for baby stage
-            age = max(age, 11)
+            // Transfer accumulated calories to totalCaloriesConsumed when hatching (even for force evolution)
+            totalCaloriesConsumed += cumulativeCalories
+            DebugConfig.debugPrint("🥚➡️🐣 Force hatched! Transferred \(cumulativeCalories) calories to totalCaloriesConsumed")
         case .baby:
             stage = .child
-            // Set minimum age for child stage
-            age = max(age, 51)
         case .child:
             stage = .teen
-            // Set minimum age for teen stage
-            age = max(age, 151)
         case .teen:
             stage = .adult
-            // Set minimum age for adult stage
-            age = max(age, 301)
         case .adult:
             stage = .elder
-            // Set minimum age for elder stage
-            age = max(age, 501)
         case .elder:
             // Already at max stage, do nothing
             DebugConfig.debugPrint("🦴 Pet is already at elder stage (max)")
@@ -381,7 +417,8 @@ class PetData {
         updateEmotion()
         
         DebugConfig.debugPrint("🚀 Force evolved from \(previousStage.displayName) to \(stage.displayName)")
-        DebugConfig.debugPrint("📅 Age set to: \(age)")
+        DebugConfig.debugPrint("📅 Age remains: \(age) days (actual days alive)")
+        DebugConfig.debugPrint("🔥 Total calories consumed: \(totalCaloriesConsumed)")
     }
 }
 

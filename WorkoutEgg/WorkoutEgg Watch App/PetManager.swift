@@ -9,10 +9,15 @@ import SwiftUI
 import SwiftData
 
 class PetManager: ObservableObject {
-    let context: ModelContext
+    private(set) var context: ModelContext
     
     init(context: ModelContext) {
         self.context = context
+    }
+    
+    /// Update the context reference (used when the actual context becomes available)
+    func updateContext(_ newContext: ModelContext) {
+        self.context = newContext
     }
     
     func getCurrentPet() -> PetData {

@@ -44,8 +44,7 @@ struct OnboardingView: View {
 }
 
 struct WorkoutStatsView: View {
-    @Bindable var petData: PetData
-    @ObservedObject var healthKitManager: HealthKitManager
+    let caloriesBurned: Double
     
     var body: some View {
         VStack(spacing: 12) {
@@ -55,28 +54,15 @@ struct WorkoutStatsView: View {
                     .imageScale(.large)
                     .foregroundStyle(.orange)
                 
-                Text("\(displayCalories)")
+                Text("\(Int(caloriesBurned))")
                     .font(.system(size: 32, weight: .bold))
                 
-                Text(caloriesLabel)
+                Text("calories today")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
         }
         .padding()
-    }
-    
-    private var displayCalories: Int {
-        // Use real HealthKit data
-        return petData.stage == .egg ?
-            Int(healthKitManager.cumulativeCalories) :
-            Int(healthKitManager.caloriesBurned)
-    }
-    
-    private var caloriesLabel: String {
-        return petData.stage == .egg ?
-            "total calories (egg stage)" :
-            "calories today"
     }
 }
 
@@ -124,6 +110,9 @@ struct ContentView: View {
     @Query private var pets: [PetData]
     @Environment(\.modelContext) private var context
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    
+    // PetManager will be initialized in onAppear with the real context
+    @State private var petManager: PetManager?
     
     // Change currentPet from computed property to @State variable
     @State private var currentPet: PetData?
@@ -180,14 +169,17 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            // Initialize petManager with the real context
+            petManager = PetManager(context: context)
+            
             // Initialize currentPet first
             let pet = getCurrentPet()
             
             // Fetch longest lived pet
-            let petManager = PetManager(context: context)
-            longestLivedPet = petManager.getLongestLivedPet()
+            longestLivedPet = petManager?.getLongestLivedPet()
             
             // Set up the connection between HealthKitManager and PetData
+            healthKitManager.requestAuthorization()
             healthKitManager.setPetData(pet)
             
             // Set up the connection between GameScene and PetData
@@ -208,6 +200,7 @@ struct ContentView: View {
         .onChange(of: currentPet?.stage) { oldValue, newValue in
             // Update GameScene when pet stage changes
             gameScene.updatePetDisplay()
+            updateProgressDisplay()
         }
         .onChange(of: currentPet?.age) { oldValue, newValue in
             // Update displays when pet age changes (indicates feeding occurred)
@@ -217,6 +210,25 @@ struct ContentView: View {
         .onChange(of: currentPet?.streak) { oldValue, newValue in
             // Update displays when pet streak changes (indicates feeding occurred)
             updateProgressDisplay()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .petEvolved)) { notification in
+            // Handle pet evolution notification from GameScene
+            if let petData = notification.object as? PetData {
+                DebugConfig.debugPrint("📢 Received pet evolution notification")
+                
+                // Save the context
+                do {
+                    try context.save()
+                    DebugConfig.debugPrint("✅ SwiftData context saved after evolution notification")
+                    DebugConfig.debugPrint("🔍 Pet stage after save: \(petData.stage.displayName)")
+                    DebugConfig.debugPrint("🔍 Total calories consumed: \(petData.totalCaloriesConsumed)")
+                } catch {
+                    DebugConfig.debugPrint("❌ Failed to save SwiftData context: \(error)")
+                }
+                
+                // Update displays
+                updateProgressDisplay()
+            }
         }
     }
     
@@ -237,6 +249,7 @@ struct ContentView: View {
                 StatusView(petData: getCurrentPet())
             }
         }
+//        .containerBackground(backgroundImage("background/bg-brown"), for: .tabView)
         .tag(0)
     }
     
@@ -254,6 +267,9 @@ struct ContentView: View {
                 }
         }
         .frame(width: 300, height: 300)
+        .containerBackground(for: .tabView) {
+            EmptyView()
+        }
         .tag(1)
     }
     
@@ -266,62 +282,73 @@ struct ContentView: View {
                 .background(Color.black.opacity(0.6))
                 .cornerRadius(6)
             
-            Button {
-                getCurrentPet().forceEvolveToNextStage()
-                
-                // Explicitly save the context to ensure changes persist
-                do {
-                    try context.save()
-                    DebugConfig.debugPrint("✅ SwiftData context saved after force evolution")
-                    DebugConfig.debugPrint("🔍 Pet stage after save: \(getCurrentPet().stage.displayName)")
-                } catch {
-                    DebugConfig.debugPrint("❌ Failed to save SwiftData context: \(error)")
+            // Debug Force Evolution Button (only in debug mode)
+            if DebugConfig.shouldShowDebugUI {
+                Button {
+                    getCurrentPet().forceEvolveToNextStage()
+                    
+                    // Explicitly save the context to ensure changes persist
+                    do {
+                        try context.save()
+                        DebugConfig.debugPrint("✅ SwiftData context saved after force evolution")
+                        DebugConfig.debugPrint("🔍 Pet stage after save: \(getCurrentPet().stage.displayName)")
+                    } catch {
+                        DebugConfig.debugPrint("❌ Failed to save SwiftData context: \(error)")
+                    }
+                    
+                    // Force UI updates
+                    gameScene.updatePetDisplay()
+                    updateProgressDisplay()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.up.circle.fill")
+                        Text("Force Evolve")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.blue)
+                    .cornerRadius(8)
                 }
-                
-                // Force UI updates
-                gameScene.updatePetDisplay()
-                updateProgressDisplay()
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "arrow.up.circle.fill")
-                    Text("Evolve Pet")
-                }
-                .font(.caption)
-                .foregroundColor(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(Color.blue)
-                .cornerRadius(8)
+                .disabled(getCurrentPet().stage == .elder || getCurrentPet().isDead)
             }
-            .disabled(getCurrentPet().stage == .elder || getCurrentPet().isDead)
         }
         .padding(.bottom, 20)
     }
     
     private var progressSceneTab: some View {
-        GeometryReader { geoProxy in
-            let progressTap = getProgressTap(geoProxy)
-            
-            SpriteView(scene: progressScene)
-                .gesture(progressTap)
-                .onAppear {
-                    let newSize = geoProxy.size
-                    progressScene.size = CGSize(width: newSize.width, height: newSize.height)
-                    progressScene.scaleMode = .resizeFill
+        Group {
+            if let petManager = petManager {
+                GeometryReader { geoProxy in
+                    let progressTap = getProgressTap(geoProxy)
                     
-                    // Force refresh HealthKit data when ProgressScene appears
-                    healthKitManager.fetchTodayCalories()
-                    updateProgressDisplay()
+                    SpriteView(scene: progressScene)
+                        .gesture(progressTap)
+                        .onAppear {
+                            let newSize = geoProxy.size
+                            progressScene.size = CGSize(width: newSize.width, height: newSize.height)
+                            progressScene.scaleMode = .resizeFill
+                            
+                            // Force refresh HealthKit data when ProgressScene appears
+                            healthKitManager.fetchTodayCalories()
+                            updateProgressDisplay()
+                        }
+                        .onChange(of: healthKitManager.cumulativeCalories) { _ in
+                            updateProgressDisplay()
+                        }
+                        .onChange(of: healthKitManager.caloriesBurned) { _ in
+                            updateProgressDisplay()
+                        }
+                        .ignoresSafeArea()
                 }
-                .onChange(of: healthKitManager.cumulativeCalories) { _ in
-                    updateProgressDisplay()
-                }
-                .onChange(of: healthKitManager.caloriesBurned) { _ in
-                    updateProgressDisplay()
-                }
-                .ignoresSafeArea()
+                .frame(width: 300, height: 300)
+            } else {
+                // Show loading or placeholder while petManager initializes
+                Text("Loading...")
+                    .frame(width: 300, height: 300)
+            }
         }
-        .frame(width: 300, height: 300)
         .tag(2)
     }
     
@@ -396,8 +423,15 @@ struct ContentView: View {
         let pScene = CGPoint(x: sceneX, y: sceneY)
         return pScene
     }
+    
+    private func backgroundImage(_ imageName: String) -> some View {
+        Image(imageName)
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+    }
 }
 
 #Preview {
     ContentView()
+        .modelContainer(for: [PetData.self, LongestLivedPetData.self])
 }

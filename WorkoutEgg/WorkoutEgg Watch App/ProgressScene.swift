@@ -212,6 +212,12 @@ class ProgressScene: SKScene {
                 foodSprite.zPosition = 0
                 foodSprite.setScale(2) // Scale food smaller than the plate
                 
+                // Give the food sprite a name for identification
+                foodSprite.name = "food-stage-\(stage)"
+                
+                // Enable user interaction on the food sprite
+                foodSprite.isUserInteractionEnabled = false // We'll handle it at scene level
+                
                 addChild(foodSprite)
                 foodSprites.append(foodSprite)
             } else {
@@ -284,5 +290,93 @@ class ProgressScene: SKScene {
         
         // Update notification with current calories
         NotificationManager.getCustomizedMessage(calories: currentCalories)
+    }
+    
+    // MARK: - Touch Handling
+    
+    // Method to handle tap points from SwiftUI (similar to GameScene)
+    func onTap(_ point: CGPoint) {
+        print("Received tap at: \(point)") // Debug tap position
+        
+        // Check if any food sprite was tapped
+        for foodSprite in foodSprites {
+            if foodSprite.contains(point) {
+                handleFoodTap(foodSprite, at: point)
+                return
+            }
+        }
+        
+        // Show miss indicator if no food was tapped
+        showTapIndicator(at: point, success: false)
+    }
+    
+    private func handleFoodTap(_ foodSprite: SKSpriteNode, at location: CGPoint) {
+        guard let petData = self.petData else { return }
+        
+        // Don't allow feeding if pet is dead
+        if petData.isDead {
+            showTapIndicator(at: location, success: false)
+            return
+        }
+        
+        // Call the feeding method
+        petData.updateAfterFed()
+        
+        // Show success indicator
+        showTapIndicator(at: location, success: true)
+        
+        // Add feeding animation to the food sprite
+        animateFoodConsumption(foodSprite)
+        
+        // Update the display after feeding
+        let displayCalories = petData.stage == .egg ?
+            Int(petData.cumulativeCalories) :
+            Int(petData.currentDayCalories)
+        updateProgress(current: displayCalories)
+        
+        print("🍎 Pet fed! New feed count: \(petData.getCurrentDayFeedCount())")
+        print("📈 Pet age: \(petData.age), streak: \(petData.streak)")
+    }
+    
+    private func showTapIndicator(at location: CGPoint, success: Bool) {
+        let indicator = SKShapeNode(circleOfRadius: 8)
+        indicator.fillColor = success ? .green : .red
+        indicator.strokeColor = .white
+        indicator.lineWidth = 2
+        indicator.position = location
+        indicator.alpha = 0.8
+        indicator.zPosition = 100
+        
+        addChild(indicator)
+        
+        // Animate the indicator
+        let scaleUp = SKAction.scale(to: 1.2, duration: 0.1)
+        let scaleDown = SKAction.scale(to: 0.8, duration: 0.1)
+        let fadeOut = SKAction.fadeOut(withDuration: 0.3)
+        let remove = SKAction.removeFromParent()
+        
+        let sequence = SKAction.sequence([
+            scaleUp,
+            scaleDown,
+            SKAction.wait(forDuration: 0.2),
+            fadeOut,
+            remove
+        ])
+        
+        indicator.run(sequence)
+    }
+    
+    private func animateFoodConsumption(_ foodSprite: SKSpriteNode) {
+        // Create a "consumption" animation for the food
+        let scaleDown = SKAction.scale(to: 0.7, duration: 0.2)
+        let scaleUp = SKAction.scale(to: 1.0, duration: 0.2)
+        let rotation = SKAction.rotate(byAngle: .pi / 8, duration: 0.1)
+        let rotateBack = SKAction.rotate(byAngle: -.pi / 8, duration: 0.1)
+        
+        let wiggle = SKAction.sequence([rotation, rotateBack])
+        let scale = SKAction.sequence([scaleDown, scaleUp])
+        
+        let group = SKAction.group([wiggle, scale])
+        foodSprite.run(group)
     }
 }

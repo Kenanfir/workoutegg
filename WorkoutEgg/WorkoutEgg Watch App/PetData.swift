@@ -84,6 +84,8 @@ class PetData {
     var isDead: Bool // New: Track if pet has died
     var missedDaysCount: Int // New: Track consecutive missed days
     var currentDayCalories: Double // New: Track current day's calories from HealthKit
+    var currentDayFeedCount: Int // New: Track current day's feed interactions
+    var lastFeedResetDate: Date // New: Track when feed count was last reset
     
     // Computed properties
     var ageInDays: String {
@@ -139,16 +141,24 @@ class PetData {
         self.isDead = isDead
         self.missedDaysCount = missedDaysCount
         self.currentDayCalories = 0 // Initialize to 0
+        self.currentDayFeedCount = 0 // Initialize to 0
+        self.lastFeedResetDate = Date() // Initialize to current date
     }
     
     func updateAfterFed() {
+        let calendar = Calendar.current
+        let today = Date()
         
-        if lastFedDate != Date(){
+        // Only increment age and streak if the pet hasn't been fed today
+        if !calendar.isDate(lastFedDate, inSameDayAs: today) {
             streak += 1
             age += 1
-            lastFedDate = Date()
+            lastFedDate = today
             missedDaysCount = 0
         }
+        
+        // Always increment today's feed count (for UI feedback)
+        incrementTodayFeedCount()
         
         // Update emotion based on streak
         updateEmotion()
@@ -241,7 +251,25 @@ class PetData {
 
     // SAMPLE CODE IMPLEMENTATION INVOLVES SWIFTDATA
     func getCurrentDayFeedCount() -> Int {
-        return Int.random(in: 0...3)
+        resetFeedCountIfNewDay()
+        return currentDayFeedCount
+    }
+    
+    /// Increments the feed count for today, resetting if it's a new day
+    func incrementTodayFeedCount() {
+        resetFeedCountIfNewDay()
+        currentDayFeedCount += 1
+    }
+    
+    /// Resets feed count if it's a new day
+    private func resetFeedCountIfNewDay() {
+        let calendar = Calendar.current
+        let today = Date()
+        
+        if !calendar.isDate(lastFeedResetDate, inSameDayAs: today) {
+            currentDayFeedCount = 0
+            lastFeedResetDate = today
+        }
     }
     
     private func updateEmotion() {
@@ -262,7 +290,7 @@ class PetData {
         }
     }
     
-    private func checkStageEvolution() -> Bool {
+    private func isReadyToEvolve() -> Bool {
         
         switch stage {
         case .egg:
@@ -291,6 +319,31 @@ class PetData {
         return false
     }
     
+    /// Check if the pet should evolve and update its stage
+    private func checkStageEvolution() {
+        // Don't evolve if pet is dead
+        if isDead { return }
+        
+        // Check if ready to evolve and update stage accordingly
+        if isReadyToEvolve() {
+            switch stage {
+            case .egg:
+                stage = .baby
+            case .baby:
+                stage = .child
+            case .child:
+                stage = .teen
+            case .teen:
+                stage = .adult
+            case .adult:
+                stage = .elder
+            case .elder:
+                // Already at max stage
+                break
+            }
+        }
+    }
+    
     // MARK: - Development/Testing Methods
     
     /// Forces the pet to evolve to the next stage by setting age to the minimum required
@@ -299,28 +352,41 @@ class PetData {
         // Don't evolve if pet is dead
         if isDead { return }
         
-        // Set age to minimum required for next stage
+        let previousStage = stage
+        
+        // Force evolution to next stage (bypassing normal requirements)
         switch stage {
         case .egg:
             stage = .baby
+            // Set minimum age for baby stage
+            age = max(age, 11)
         case .baby:
             stage = .child
+            // Set minimum age for child stage
+            age = max(age, 51)
         case .child:
             stage = .teen
+            // Set minimum age for teen stage
+            age = max(age, 151)
         case .teen:
             stage = .adult
+            // Set minimum age for adult stage
+            age = max(age, 301)
         case .adult:
             stage = .elder
+            // Set minimum age for elder stage
+            age = max(age, 501)
         case .elder:
             // Already at max stage, do nothing
+            print("🦴 Pet is already at elder stage (max)")
             return
         }
         
-        // Update the stage based on new age
-        checkStageEvolution()
-        
         // Update emotion based on current streak
         updateEmotion()
+        
+        print("🚀 Force evolved from \(previousStage.displayName) to \(stage.displayName)")
+        print("📅 Age set to: \(age)")
     }
 }
 

@@ -132,6 +132,10 @@ class GameScene: SKScene {
                 print("Pet tapped!")
                 marker.fillColor = .green // Green for successful tap
                 wigglePet(pet)
+                
+                // GameScene only provides visual feedback - no feeding!
+                // Feeding is exclusively handled by ProgressScene when tapping food items
+                print("🎮 GameScene: Pet interaction complete (visual only)")
             } else {
                 print("Tap missed pet. Distance from pet center: \(distance(from: point, to: pet.position))")
                 marker.fillColor = .red // Red for missed tap

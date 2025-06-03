@@ -67,12 +67,16 @@ struct WorkoutStatsView: View {
     }
     
     private var displayCalories: Int {
-        // Simulate 300 KCal for testing
-        return 300
+        // Use real HealthKit data
+        return petData.stage == .egg ?
+            Int(healthKitManager.cumulativeCalories) :
+            Int(healthKitManager.caloriesBurned)
     }
     
     private var caloriesLabel: String {
-        return "simulated calories (testing)"
+        return petData.stage == .egg ?
+            "total calories (egg stage)" :
+            "calories today"
     }
 }
 
@@ -121,27 +125,11 @@ struct ContentView: View {
     @Environment(\.modelContext) private var context
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     
-    // PetManager for fetching pets
-    private var petManager: PetManager {
-        PetManager(context: context)
-    }
+    // Change currentPet from computed property to @State variable
+    @State private var currentPet: PetData?
     
-    // Get the current pet (or create one if none exists)
-    private var currentPet: PetData {
-        if let pet = pets.first {
-            return pet
-        } else {
-            let newPet = PetData()
-            context.insert(newPet)
-            try? context.save()
-            return newPet
-        }
-    }
-    
-    // Fetch the longest lived pet
-    private var longestLivedPet: LongestLivedPetData? {
-        petManager.getLongestLivedPet()
-    }
+    // State for longest lived pet
+    @State private var longestLivedPet: LongestLivedPetData?
     
     @State private var selectedTab = 1
     @State private var gameScene: GameScene = {
@@ -158,132 +146,202 @@ struct ContentView: View {
         return scene
     }()
     
+    // Helper to get or create current pet
+    private func getCurrentPet() -> PetData {
+        if let pet = currentPet {
+            return pet
+        }
+        
+        // Try to get existing pet from database
+        if let existingPet = pets.first {
+            currentPet = existingPet
+            return existingPet
+        }
+        
+        // Create new pet if none exists
+        let newPet = PetData()
+        context.insert(newPet)
+        do {
+            try context.save()
+            currentPet = newPet
+            print("✅ Created new pet and saved to SwiftData")
+        } catch {
+            print("❌ Failed to save new pet: \(error)")
+        }
+        return newPet
+    }
+    
     var body: some View {
         Group {
             if !hasCompletedOnboarding {
                 OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
             } else {
-                TabView(selection: $selectedTab) {
-                    // Status View (Left) - now scrollable
-                    ScrollableStatusView(currentPet: currentPet, longestLivedPet: longestLivedPet)
-                        .tag(0)
-                    
-                    // Egg Scene View (Middle - Main Screen)
-                    GeometryReader { geoProxy in
-                        let tap = getTap(geoProxy)
-                        
-                        SpriteView(scene: gameScene)
-                            .gesture(tap)
-                            .ignoresSafeArea(.all)
-                            .overlay(alignment: .bottom) {
-                                // Development/Testing Button Overlay
-                                VStack(spacing: 8) {
-                                    Text("Current Stage: \(currentPet.stage.displayName)")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                        .padding(.horizontal, 8)
-                                        .background(Color.black.opacity(0.6))
-                                        .cornerRadius(6)
-                                    
-                                    Button {
-                                        currentPet.forceEvolveToNextStage()
-                                    } label: {
-                                        HStack(spacing: 4) {
-                                            Image(systemName: "arrow.up.circle.fill")
-                                            Text("Evolve Pet")
-                                        }
-                                        .font(.caption)
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(Color.blue)
-                                        .cornerRadius(8)
-                                    }
-                                    .disabled(currentPet.stage == .elder || currentPet.isDead)
-                                }
-                                .padding(.bottom, 20)
-                            }
-                    }
-                    .frame(width: 300, height: 300)
-                    .tag(1)
-                    
-                    // Progress Scene View
-                    GeometryReader { geoProxy in
-                        SpriteView(scene: progressScene)
-                            .onAppear {
-                                let newSize = geoProxy.size
-                                progressScene.size = CGSize(width: newSize.width, height: newSize.height)
-                                progressScene.scaleMode = .resizeFill
-                                updateProgressDisplay()
-                            }
-                            .onChange(of: healthKitManager.cumulativeCalories) { _ in
-                                updateProgressDisplay()
-                            }
-                            .onChange(of: healthKitManager.caloriesBurned) { _ in
-                                updateProgressDisplay()
-                            }
-                            .ignoresSafeArea()
-                            .overlay(alignment: .bottom) {
-                                // Debug/Testing Button Overlay
-                                VStack(spacing: 8) {
-                                    Button {
-                                        updateProgressDisplay()
-                                    } label: {
-                                        HStack(spacing: 4) {
-                                            Image(systemName: "arrow.clockwise.circle.fill")
-                                            Text("Update Food")
-                                        }
-                                        .font(.caption)
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(Color.green)
-                                        .cornerRadius(8)
-                                    }
-                                    
-                                    Text("300 KCal (Simulated)")
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                        .padding(.horizontal, 8)
-                                        .background(Color.black.opacity(0.6))
-                                        .cornerRadius(6)
-                                }
-                                .padding(.bottom, 20)
-                            }
-                    }
-                    .frame(width: 300, height: 300)
-                    .tag(2)
-                }
-                .tabViewStyle(.page)
+                mainTabView
             }
         }
         .onAppear {
+            // Initialize currentPet first
+            let pet = getCurrentPet()
+            
+            // Fetch longest lived pet
+            let petManager = PetManager(context: context)
+            longestLivedPet = petManager.getLongestLivedPet()
+            
             // Set up the connection between HealthKitManager and PetData
-            healthKitManager.setPetData(currentPet)
+            healthKitManager.setPetData(pet)
             
             // Set up the connection between GameScene and PetData
-            gameScene.setPetData(currentPet)
+            gameScene.setPetData(pet)
             
             // Set up the connection between ProgressScene and PetData
-            progressScene.setPetData(currentPet)
+            progressScene.setPetData(pet)
             
             // Check for missed workouts when app opens
-            currentPet.checkMissedFed()
+            pet.checkMissedFed()
         }
-        .onChange(of: currentPet.stage) { oldValue, newValue in
+        .onChange(of: pets) { oldValue, newValue in
+            // Update currentPet when pets query changes
+            if let pet = newValue.first {
+                currentPet = pet
+            }
+        }
+        .onChange(of: currentPet?.stage) { oldValue, newValue in
             // Update GameScene when pet stage changes
             gameScene.updatePetDisplay()
         }
+        .onChange(of: currentPet?.age) { oldValue, newValue in
+            // Update displays when pet age changes (indicates feeding occurred)
+            updateProgressDisplay()
+            gameScene.updatePetDisplay()
+        }
+        .onChange(of: currentPet?.streak) { oldValue, newValue in
+            // Update displays when pet streak changes (indicates feeding occurred)
+            updateProgressDisplay()
+        }
+    }
+    
+    private var mainTabView: some View {
+        TabView(selection: $selectedTab) {
+            statusTab
+            gameSceneTab
+            progressSceneTab
+        }
+        .tabViewStyle(.page)
+    }
+    
+    private var statusTab: some View {
+        Group {
+            if let pet = currentPet {
+                ScrollableStatusView(currentPet: pet, longestLivedPet: longestLivedPet)
+            } else {
+                StatusView(petData: getCurrentPet())
+            }
+        }
+        .tag(0)
+    }
+    
+    private var gameSceneTab: some View {
+        GeometryReader { geoProxy in
+            let tap = getTap(geoProxy)
+            
+            SpriteView(scene: gameScene)
+                .gesture(tap)
+                .ignoresSafeArea(.all)
+                .overlay(alignment: .bottom) {
+                    gameSceneOverlay
+                }
+        }
+        .frame(width: 300, height: 300)
+        .tag(1)
+    }
+    
+    private var gameSceneOverlay: some View {
+        VStack(spacing: 8) {
+            Text("Current Stage: \(getCurrentPet().stage.displayName)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 8)
+                .background(Color.black.opacity(0.6))
+                .cornerRadius(6)
+            
+            Button {
+                getCurrentPet().forceEvolveToNextStage()
+                
+                // Explicitly save the context to ensure changes persist
+                do {
+                    try context.save()
+                    print("✅ SwiftData context saved after force evolution")
+                    print("🔍 Pet stage after save: \(getCurrentPet().stage.displayName)")
+                } catch {
+                    print("❌ Failed to save SwiftData context: \(error)")
+                }
+                
+                // Force UI updates
+                gameScene.updatePetDisplay()
+                updateProgressDisplay()
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "arrow.up.circle.fill")
+                    Text("Evolve Pet")
+                }
+                .font(.caption)
+                .foregroundColor(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Color.blue)
+                .cornerRadius(8)
+            }
+            .disabled(getCurrentPet().stage == .elder || getCurrentPet().isDead)
+        }
+        .padding(.bottom, 20)
+    }
+    
+    private var progressSceneTab: some View {
+        GeometryReader { geoProxy in
+            let progressTap = getProgressTap(geoProxy)
+            
+            SpriteView(scene: progressScene)
+                .gesture(progressTap)
+                .onAppear {
+                    let newSize = geoProxy.size
+                    progressScene.size = CGSize(width: newSize.width, height: newSize.height)
+                    progressScene.scaleMode = .resizeFill
+                    
+                    // Force refresh HealthKit data when ProgressScene appears
+                    healthKitManager.fetchTodayCalories()
+                    updateProgressDisplay()
+                }
+                .onChange(of: healthKitManager.cumulativeCalories) { _ in
+                    updateProgressDisplay()
+                }
+                .onChange(of: healthKitManager.caloriesBurned) { _ in
+                    updateProgressDisplay()
+                }
+                .ignoresSafeArea()
+        }
+        .frame(width: 300, height: 300)
+        .tag(2)
     }
     
     private func updateProgressDisplay() {
-        // Simulate 300 KCal instead of using HealthKit data
-        let displayCalories = 700
+        // Use real HealthKit data
+        let displayCalories = getCurrentPet().stage == .egg ?
+            Int(healthKitManager.cumulativeCalories) :
+            Int(healthKitManager.caloriesBurned)
         
         // Print debug info for currentDayFeedCount
-        let currentFoodCount = currentPet.getCurrentDayFeedCount()
+        let currentFoodCount = getCurrentPet().getCurrentDayFeedCount()
         print("🍎 Current Day Feed Count: \(currentFoodCount)")
         print("📊 Display Calories: \(displayCalories)")
+        
+        // Debug HealthKit data
+        print("🔥 HealthKit Debug:")
+        print("   - Pet Stage: \(getCurrentPet().stage.displayName)")
+        print("   - HealthKit caloriesBurned: \(healthKitManager.caloriesBurned)")
+        print("   - HealthKit cumulativeCalories: \(healthKitManager.cumulativeCalories)")
+        print("   - Pet currentDayCalories: \(getCurrentPet().currentDayCalories)")
+        print("   - Pet cumulativeCalories: \(getCurrentPet().cumulativeCalories)")
+        print("   - Final displayCalories sent to ProgressScene: \(displayCalories)")
         
         progressScene.updateProgress(current: displayCalories)
     }
@@ -295,16 +353,8 @@ struct ContentView: View {
                 let pScene = getScenePosition(tapValue.location, geoProxy)
                 gameScene.onTap(pScene)
                 
-                // Store the previous stage
-                let previousStage = currentPet.stage
-                
-                // Update pet data when interacting with the egg
-                currentPet.updateAfterFed()
-                
-                // Update GameScene display if stage changed
-                if previousStage != currentPet.stage {
-                    gameScene.updatePetDisplay()
-                }
+                // Note: updateAfterFed() should only be called by GameScene when pet is actually hit
+                // GameScene handles its own hit detection and feeding logic
             }
     }
     
@@ -315,6 +365,32 @@ struct ContentView: View {
         let normalizedY = tapPosition.y / viewSize.height
         let sceneX = (normalizedX - 0.5) * Constants.sceneSize.width
         let sceneY = (0.5 - normalizedY) * Constants.sceneSize.height
+        let pScene = CGPoint(x: sceneX, y: sceneY)
+        return pScene
+    }
+    
+    // Get progress tap gesture with coordinate conversion
+    func getProgressTap(_ geoProxy: GeometryProxy) -> some Gesture {
+        return SpatialTapGesture(coordinateSpace: .local)
+            .onEnded { tapValue in
+                let pScene = getProgressScenePosition(tapValue.location, geoProxy)
+                progressScene.onTap(pScene)
+                
+                // Note: updateAfterFed() is already called inside progressScene.onTap()
+                // when food is successfully tapped, so we don't need to call it here
+            }
+    }
+    
+    // Convert tap position to scene position for progress scene
+    func getProgressScenePosition(_ tapPosition: CGPoint, _ geoProxy: GeometryProxy) -> CGPoint {
+        let viewSize = geoProxy.size
+        let normalizedX = tapPosition.x / viewSize.width
+        let normalizedY = tapPosition.y / viewSize.height
+        
+        // ProgressScene uses a 300x300 size, so use that for conversion
+        let progressSceneSize = CGSize(width: 300, height: 300)
+        let sceneX = (normalizedX - 0.5) * progressSceneSize.width
+        let sceneY = (0.5 - normalizedY) * progressSceneSize.height
         let pScene = CGPoint(x: sceneX, y: sceneY)
         return pScene
     }

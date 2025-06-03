@@ -171,10 +171,6 @@ class PetData {
         return 0
     }
     
-    func checkFoodStage() -> Int {
-        return 0
-    }
-    
     func addCaloriesConsumed(_ calories: Double) {
         totalCaloriesConsumed += calories
     }

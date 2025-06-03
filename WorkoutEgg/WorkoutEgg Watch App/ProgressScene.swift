@@ -70,7 +70,9 @@ class ProgressScene: SKScene {
         emptyPlateSprite = nil
         
         setupProgressBar()
-        setupEmptyPlate()
+        if let petData = petData, petData.stage != .egg {
+            setupEmptyPlate()
+        }
         
         // Use pet data's current food count
         let currentFoodCount = petData?.getCurrentDayFeedCount() ?? 0

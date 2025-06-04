@@ -54,7 +54,7 @@ struct StatusRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.custom("VCROSDMono", size: 9))
+                .font(.custom("VCROSDMono", size: 12))
                 .foregroundColor(.white)
                 .frame(width: 80, alignment: .leading)
             
@@ -62,7 +62,7 @@ struct StatusRow: View {
             
             if !value.isEmpty {
                 Text(value)
-                    .font(.custom("VCROSDMono", size: 9))
+                    .font(.custom("VCROSDMono", size: 12))
                     .foregroundColor(.white)
             }
         }

@@ -94,7 +94,7 @@ struct ScrollableStatusView: View {
                         LongestLivedPetCardCompact(
                             petData: LongestLivedPetData(
                                 age: 0,
-                                species: .fufufafa,
+                                species: .kikimora,
                                 stage: .egg,
                                 emotion: .content,
                                 totalCaloriesConsumed: 0,

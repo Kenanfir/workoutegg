@@ -5,7 +5,7 @@ import UserNotifications
 class ProgressScene: SKScene {
     private let barAssetName = "IconsAndLabels/progress-bar-full"
     private let emptyBarAssetName = "IconsAndLabels/progress-bar"
-    private var emptyPlate = "food-plate"
+    private var emptyPlate = "Food/food-plate"
     private var caloriesLabel: SKLabelNode?
     private var stageLabel: SKLabelNode?
     private let maxCalories: Int = 600 // Maximum achievable calories
@@ -20,7 +20,7 @@ class ProgressScene: SKScene {
     private var emptyPlateSprite: SKSpriteNode?
     private var foodSprites: [SKSpriteNode] = []
 
-    private let barScale: CGFloat = 2
+    private let barScale: CGFloat = 1
     
     // Initialize with PetData
     init(petData: PetData?) {
@@ -50,7 +50,7 @@ class ProgressScene: SKScene {
         }
         background.position = CGPoint(x: 0, y: 0)
         background.zPosition = -1
-        background.setScale(2.2)
+        background.setScale(1)
         addChild(background)
 
         isUserInteractionEnabled = true
@@ -126,7 +126,7 @@ class ProgressScene: SKScene {
         emptyPlateSprite = SKSpriteNode(texture: plateTexture)
         emptyPlateSprite!.position = CGPoint(x: 0, y: -60) // Position under the progress bar
         emptyPlateSprite!.zPosition = -0.5 // Behind progress bar but in front of background
-        emptyPlateSprite!.setScale(2.5) // Same scale as progress bar
+        emptyPlateSprite!.setScale(1) // Same scale as progress bar
         addChild(emptyPlateSprite!)
     }
 
@@ -212,7 +212,7 @@ class ProgressScene: SKScene {
                 
                 foodSprite.position = CGPoint(x: xOffset, y: -60 + yOffset)
                 foodSprite.zPosition = 0
-                foodSprite.setScale(2) // Scale food smaller than the plate
+                foodSprite.setScale(1) // Scale food smaller than the plate
                 
                 // Give the food sprite a name for identification
                 foodSprite.name = "food-stage-\(stage)"

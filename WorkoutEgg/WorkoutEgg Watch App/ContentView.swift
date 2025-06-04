@@ -211,6 +211,13 @@ struct ContentView: View {
             // Update displays when pet streak changes (indicates feeding occurred)
             updateProgressDisplay()
         }
+        .onChange(of: currentPet?.emotion) { oldValue, newValue in
+            // Update pet animation when emotion changes (affects which animation frames to use)
+            if oldValue != newValue {
+                DebugConfig.debugPrint("🎭 Pet emotion changed from \(oldValue?.displayName ?? "nil") to \(newValue?.displayName ?? "nil")")
+                gameScene.updatePetAnimation()
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .petEvolved)) { notification in
             // Handle pet evolution notification from GameScene
             if let petData = notification.object as? PetData {
@@ -289,6 +296,23 @@ struct ContentView: View {
                 .padding(.horizontal, 8)
                 .background(Color.black.opacity(0.6))
                 .cornerRadius(6)
+            
+            // Show current animation info
+            if DebugConfig.shouldShowDebugUI {
+                Text("Animation: \(getCurrentPet().petAnimationFrames.first ?? "None")")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .background(Color.black.opacity(0.6))
+                    .cornerRadius(6)
+                
+                Text("Emotion: \(getCurrentPet().emotion.displayName)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .background(Color.black.opacity(0.6))
+                    .cornerRadius(6)
+            }
             
             // Debug Force Evolution Button (only in debug mode)
             if DebugConfig.shouldShowDebugUI {

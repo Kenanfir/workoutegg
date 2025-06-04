@@ -19,6 +19,15 @@ enum PetSpecies: String, CaseIterable, Codable {
     var displayName: String {
         return rawValue
     }
+    
+    var camelCaseName: String {
+        switch self {
+        case .kikimora: return "Kikimora"
+        case .fufufafa: return "Fufufafa"
+        case .bubbles: return "Bubbles"
+        case .sparkle: return "Sparkle"
+        }
+    }
 }
 
 enum PetEmotion: String, CaseIterable, Codable {
@@ -32,6 +41,18 @@ enum PetEmotion: String, CaseIterable, Codable {
     
     var displayName: String {
         return rawValue
+    }
+    
+    var camelCaseName: String {
+        switch self {
+        case .happy: return "Happy"
+        case .sad: return "Sad"
+        case .angry: return "Angry"
+        case .excited: return "Excited"
+        case .sleepy: return "Sleepy"
+        case .tantrum: return "Tantrum"
+        case .content: return "Content"
+        }
     }
     
     var color: Color {
@@ -63,6 +84,17 @@ enum PetStage: Int, CaseIterable, Codable {
         case .teen: return "TEEN"
         case .adult: return "ADULT"
         case .elder: return "ELDER"
+        }
+    }
+    
+    var camelCaseName: String {
+        switch self {
+        case .egg: return "Egg"
+        case .baby: return "Baby"
+        case .child: return "Child"
+        case .teen: return "Teen"
+        case .adult: return "Adult"
+        case .elder: return "Elder"
         }
     }
 }
@@ -108,16 +140,34 @@ class PetData {
         switch stage {
         case .egg:
             return "Egg/egg-2-wo-normal"
-        case .baby:
-            return "Pet-Test/baby-\(species.rawValue.lowercased())"
-        case .child:
-            return "Pet-Test/child-\(species.rawValue.lowercased())"
-        case .teen:
-            return "Pet-Test/teen-\(species.rawValue.lowercased())"
-        case .adult:
-            return "Pet-Test/adult-\(species.rawValue.lowercased())"
-        case .elder:
-            return "Pet-Test/elder-\(species.rawValue.lowercased())"
+        case .baby, .child, .teen, .adult, .elder:
+            // For animated pets, return frame 1 as the default static image
+            return "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)IdleFr1"
+        }
+    }
+    
+    /// Returns all animation frame paths for the current pet state (for idle animation)
+    var petAnimationFrames: [String] {
+        switch stage {
+        case .egg:
+            // Eggs don't have animation frames, return single static image
+            return ["Egg/egg-2-wo-normal"]
+        case .baby, .child, .teen, .adult, .elder:
+            // Return all 4 animation frames for idle animation
+            return (1...4).map { frameNumber in
+                "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)IdleFr\(frameNumber)"
+            }
+        }
+    }
+    
+    /// Returns a specific animation frame for the current pet state
+    func getPetAnimationFrame(_ frameNumber: Int) -> String {
+        switch stage {
+        case .egg:
+            return "Egg/egg-2-wo-normal"
+        case .baby, .child, .teen, .adult, .elder:
+            let clampedFrame = max(1, min(4, frameNumber)) // Ensure frame is between 1-4
+            return "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)IdleFr\(clampedFrame)"
         }
     }
     
@@ -461,16 +511,9 @@ class LongestLivedPetData {
         switch stage {
         case .egg:
             return "Egg/egg-2-wo-normal"
-        case .baby:
-            return "Pet/baby-\(species.rawValue.lowercased())"
-        case .child:
-            return "Pet/child-\(species.rawValue.lowercased())"
-        case .teen:
-            return "Pet/teen-\(species.rawValue.lowercased())"
-        case .adult:
-            return "Pet/adult-\(species.rawValue.lowercased())"
-        case .elder:
-            return "Pet/elder-\(species.rawValue.lowercased())"
+        case .baby, .child, .teen, .adult, .elder:
+            // For animated pets, return frame 1 as the default static image
+            return "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)IdleFr1"
         }
     }
     

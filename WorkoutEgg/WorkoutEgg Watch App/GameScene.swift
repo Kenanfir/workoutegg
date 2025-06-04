@@ -31,7 +31,7 @@ class GameScene: SKScene {
         background.position = CGPoint(x: 0, y: 0)
         background.zPosition = -1 // Place it behind other elements
         
-        background.setScale(0.75)
+        background.setScale(1)
         
         addChild(background)
         isUserInteractionEnabled = true
@@ -55,22 +55,109 @@ class GameScene: SKScene {
         // Remove existing pet sprite
         childNode(withName: "pet")?.removeFromParent()
         
-        // Create new pet sprite with current image
+        // Create new pet sprite with current image/animation
         setupPet()
         
         // Update evolution button visibility
         updateEvolutionButton()
     }
     
+    /// Update only the pet animation frames (for emotion changes)
+    func updatePetAnimation() {
+        guard let petData = self.petData,
+              let pet = childNode(withName: "pet") as? SKSpriteNode else { return }
+        
+        // Only update animation for non-egg pets
+        if petData.stage != .egg {
+            // Stop current animation
+            pet.removeAction(forKey: "idleAnimation")
+            
+            // Load new animation frames
+            let animationFrames = petData.petAnimationFrames
+            var textures: [SKTexture] = []
+            for framePath in animationFrames {
+                let texture = SKTexture(imageNamed: framePath)
+                if texture.size() != CGSize.zero {
+                    textures.append(texture)
+                }
+            }
+            
+            // Start new animation if we have frames
+            if textures.count > 1 {
+                let idleAnimation = SKAction.animate(with: textures, timePerFrame: 0.5)
+                let repeatForever = SKAction.repeatForever(idleAnimation)
+                pet.run(repeatForever, withKey: "idleAnimation")
+                DebugConfig.debugPrint("Updated idle animation for emotion: \(petData.emotion.displayName)")
+            } else if !textures.isEmpty {
+                // Set static texture if only one frame
+                pet.texture = textures[0]
+            }
+        }
+    }
+    
     private func setupPet() {
         DebugConfig.debugPrint("Setting up pet")
         
-        // Get the current pet image name, fallback to egg if no pet data
-        let imageName = petData?.petImageName ?? "Egg/egg-2-wo-normal"
+        // Get the current pet data, fallback to default if no pet data
+        guard let petData = self.petData else {
+            // Fallback to egg if no pet data
+            let pet = SKSpriteNode(imageNamed: "Egg/egg-2-wo-normal")
+            configurePetSprite(pet, imageName: "Egg/egg-2-wo-normal")
+            return
+        }
         
-        // Create the pet sprite
-        let pet = SKSpriteNode(imageNamed: imageName)
+        // Check if this is an egg or an animated pet
+        if petData.stage == .egg {
+            // Create static egg sprite
+            let imageName = petData.petImageName
+            let pet = SKSpriteNode(imageNamed: imageName)
+            configurePetSprite(pet, imageName: imageName)
+        } else {
+            // Create animated pet sprite
+            createAnimatedPet(petData: petData)
+        }
+    }
+    
+    /// Creates an animated pet using the animation frames
+    private func createAnimatedPet(petData: PetData) {
+        let animationFrames = petData.petAnimationFrames
         
+        // Create textures from animation frame paths
+        var textures: [SKTexture] = []
+        for framePath in animationFrames {
+            let texture = SKTexture(imageNamed: framePath)
+            if texture.size() != CGSize.zero {
+                textures.append(texture)
+                DebugConfig.debugPrint("Loaded animation frame: \(framePath)")
+            } else {
+                DebugConfig.debugPrint("Failed to load animation frame: \(framePath)")
+            }
+        }
+        
+        // Create sprite with first frame or fallback to static image
+        let pet: SKSpriteNode
+        if !textures.isEmpty {
+            pet = SKSpriteNode(texture: textures[0])
+            
+            // Create idle animation if we have multiple frames
+            if textures.count > 1 {
+                let idleAnimation = SKAction.animate(with: textures, timePerFrame: 0.5) // 0.5 seconds per frame
+                let repeatForever = SKAction.repeatForever(idleAnimation)
+                pet.run(repeatForever, withKey: "idleAnimation")
+                DebugConfig.debugPrint("Started idle animation with \(textures.count) frames")
+            }
+        } else {
+            // Fallback to static image if animation frames fail to load
+            let fallbackImageName = petData.petImageName
+            pet = SKSpriteNode(imageNamed: fallbackImageName)
+            DebugConfig.debugPrint("Using fallback static image: \(fallbackImageName)")
+        }
+        
+        configurePetSprite(pet, imageName: animationFrames.first ?? petData.petImageName)
+    }
+    
+    /// Configures the pet sprite with common properties
+    private func configurePetSprite(_ pet: SKSpriteNode, imageName: String) {
         // Debug print to check if image was loaded
         if pet.texture == nil {
             DebugConfig.debugPrint("Failed to load pet image: \(imageName)")
@@ -80,7 +167,7 @@ class GameScene: SKScene {
         }
         
         // Keep original size but scale it down to fit
-        let scale: CGFloat = 0.6 // Scale down to fit
+        let scale: CGFloat = 0.2 // Scale down to fit
         pet.size = CGSize(width: pet.size.width * scale, height: pet.size.height * scale)
         
         // Set the anchor point to the bottom center

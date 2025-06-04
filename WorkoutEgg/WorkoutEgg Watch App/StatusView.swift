@@ -145,15 +145,117 @@ struct LongestLivedPetCardCompact: View {
                 .padding(.bottom, 2)
                 
                 if !petData.petImageName.isEmpty {
-                    Image(petData.petImageName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: 80)
+                    AnimatedLongestLivedPetImage(petData: petData, frameHeight: 80)
                         .padding(.vertical, 4)
                 }
             }
         }
         .frame(maxWidth: .infinity, minHeight: 120)
+    }
+}
+
+/// SwiftUI view that displays an animated pet using Timer to cycle through frames
+struct AnimatedPetImage: View {
+    let petData: PetData
+    let frameHeight: CGFloat
+    
+    @State private var currentFrame = 1
+    @State private var animationTimer: Timer?
+    
+    var body: some View {
+        Group {
+            if petData.stage == .egg {
+                // Static egg image
+                Image(petData.petImageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: frameHeight)
+            } else {
+                // Animated pet image
+                Image(petData.getPetAnimationFrame(currentFrame))
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: frameHeight)
+                    .onAppear {
+                        startAnimation()
+                    }
+                    .onDisappear {
+                        stopAnimation()
+                    }
+                    .onChange(of: petData.emotion) { _, _ in
+                        // Restart animation when emotion changes
+                        stopAnimation()
+                        startAnimation()
+                    }
+                    .onChange(of: petData.stage) { _, _ in
+                        // Restart animation when stage changes
+                        stopAnimation()
+                        startAnimation()
+                    }
+            }
+        }
+    }
+    
+    private func startAnimation() {
+        // Only animate non-egg pets
+        guard petData.stage != .egg else { return }
+        
+        animationTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
+            currentFrame = currentFrame >= 4 ? 1 : currentFrame + 1
+        }
+    }
+    
+    private func stopAnimation() {
+        animationTimer?.invalidate()
+        animationTimer = nil
+    }
+}
+
+/// Similar animated view for LongestLivedPetData
+struct AnimatedLongestLivedPetImage: View {
+    let petData: LongestLivedPetData
+    let frameHeight: CGFloat
+    
+    @State private var currentFrame = 1
+    @State private var animationTimer: Timer?
+    
+    var body: some View {
+        Group {
+            if petData.stage == .egg {
+                // Static egg image
+                Image(petData.petImageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: frameHeight)
+            } else {
+                // Animated pet image - use first frame as fallback if animation fails
+                let framePath = "Pet/\(petData.species.camelCaseName)\(petData.stage.camelCaseName)\(petData.emotion.camelCaseName)IdleFr\(currentFrame)"
+                Image(framePath)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: frameHeight)
+                    .onAppear {
+                        startAnimation()
+                    }
+                    .onDisappear {
+                        stopAnimation()
+                    }
+            }
+        }
+    }
+    
+    private func startAnimation() {
+        // Only animate non-egg pets
+        guard petData.stage != .egg else { return }
+        
+        animationTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
+            currentFrame = currentFrame >= 4 ? 1 : currentFrame + 1
+        }
+    }
+    
+    private func stopAnimation() {
+        animationTimer?.invalidate()
+        animationTimer = nil
     }
 }
 

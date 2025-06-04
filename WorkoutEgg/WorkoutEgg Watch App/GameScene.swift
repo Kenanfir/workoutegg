@@ -431,10 +431,7 @@ class GameScene: SKScene {
             showTapIndicator(at: location, success: false)
             return
         }
-        
-        // Call the feeding method
-        petData.updateAfterFed()
-        
+                
         // Show success indicator
         showTapIndicator(at: location, success: true)
         
@@ -443,8 +440,6 @@ class GameScene: SKScene {
         
         // Update evolution button in case pet became ready to evolve
         updateEvolutionButton()
-        
-        DebugConfig.debugPrint("🍎 Pet fed! Age: \(petData.age), Streak: \(petData.streak)")
     }
     
     private func showEvolutionEffect() {

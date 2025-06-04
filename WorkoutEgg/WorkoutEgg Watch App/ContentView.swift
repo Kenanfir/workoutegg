@@ -179,6 +179,15 @@ struct ContentView: View {
             // Fetch longest lived pet
             longestLivedPet = petManager?.getLongestLivedPet()
             
+            // Set up the callback for when HealthKit data is loaded
+            healthKitManager.onDataLoaded = { [weak gameScene] in
+                DispatchQueue.main.async {
+                    // Update evolution button and progress when HealthKit data is actually loaded
+                    gameScene?.updateEvolutionButton()
+                    updateProgressDisplay()
+                }
+            }
+            
             // Set up the connection between HealthKitManager and PetData
             healthKitManager.requestAuthorization()
             healthKitManager.setPetData(pet)
@@ -191,6 +200,9 @@ struct ContentView: View {
             
             // Check for missed workouts when app opens
             pet.runAtStartOfApp()
+            
+            // Force refresh HealthKit data (callback will handle evolution button update)
+            healthKitManager.fetchTodayCalories()
         }
         .onChange(of: pets) { oldValue, newValue in
             // Update currentPet when pets query changes
@@ -274,12 +286,9 @@ struct ContentView: View {
                     }
                 }
                 .onAppear {
-                    // Force refresh HealthKit data and update evolution button when GameScene appears
+                    // Force refresh HealthKit data when GameScene appears
                     healthKitManager.fetchTodayCalories()
-                    // Add a small delay to ensure HealthKit data is processed before checking evolution
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        gameScene.updateEvolutionButton()
-                    }
+                    // Evolution button will be updated via the onDataLoaded callback
                 }
         }
         .frame(width: 300, height: 300)
@@ -395,23 +404,35 @@ struct ContentView: View {
     }
     
     private func updateProgressDisplay() {
-        // Use real HealthKit data
-        let displayCalories = getCurrentPet().stage == .egg ?
+        // Ensure pet data is updated with current HealthKit values first
+        let pet = getCurrentPet()
+        
+        // Update pet's internal calories data for evolution checks
+        if pet.stage == .egg {
+            // For eggs: use both today's calories and cumulative calories
+            pet.updateCumulativeCalories(todayCalories: healthKitManager.caloriesBurned, cumulativeCalories: healthKitManager.cumulativeCalories)
+        } else {
+            // For other stages: use only today's calories
+            pet.updateCumulativeCalories(todayCalories: healthKitManager.caloriesBurned)
+        }
+        
+        // Use real HealthKit data for display
+        let displayCalories = pet.stage == .egg ?
             Int(healthKitManager.cumulativeCalories) :
             Int(healthKitManager.caloriesBurned)
         
         // Debug info for currentDayFeedCount
-        let currentFoodCount = getCurrentPet().getCurrentDayFeedCount()
+        let currentFoodCount = pet.getCurrentDayFeedCount()
         DebugConfig.debugPrint("🍎 Current Day Feed Count: \(currentFoodCount)")
         DebugConfig.debugPrint("📊 Display Calories: \(displayCalories)")
         
         // Debug HealthKit data
         DebugConfig.debugPrint("🔥 HealthKit Debug:")
-        DebugConfig.debugPrint("   - Pet Stage: \(getCurrentPet().stage.displayName)")
+        DebugConfig.debugPrint("   - Pet Stage: \(pet.stage.displayName)")
         DebugConfig.debugPrint("   - HealthKit caloriesBurned: \(healthKitManager.caloriesBurned)")
         DebugConfig.debugPrint("   - HealthKit cumulativeCalories: \(healthKitManager.cumulativeCalories)")
-        DebugConfig.debugPrint("   - Pet currentDayCalories: \(getCurrentPet().currentDayCalories)")
-        DebugConfig.debugPrint("   - Pet cumulativeCalories: \(getCurrentPet().cumulativeCalories)")
+        DebugConfig.debugPrint("   - Pet currentDayCalories: \(pet.currentDayCalories)")
+        DebugConfig.debugPrint("   - Pet cumulativeCalories: \(pet.cumulativeCalories)")
         DebugConfig.debugPrint("   - Final displayCalories sent to ProgressScene: \(displayCalories)")
         
         progressScene.updateProgress(current: displayCalories)
@@ -424,8 +445,6 @@ struct ContentView: View {
                 let pScene = getScenePosition(tapValue.location, geoProxy)
                 gameScene.onTap(pScene)
                 
-                // Note: updateAfterFed() should only be called by GameScene when pet is actually hit
-                // GameScene handles its own hit detection and feeding logic
             }
     }
     
@@ -447,8 +466,6 @@ struct ContentView: View {
                 let pScene = getProgressScenePosition(tapValue.location, geoProxy)
                 progressScene.onTap(pScene)
                 
-                // Note: updateAfterFed() is already called inside progressScene.onTap()
-                // when food is successfully tapped, so we don't need to call it here
             }
     }
     

@@ -206,6 +206,12 @@ class ProgressScene: SKScene {
         }
         foodSprites.removeAll()
         
+        DebugConfig.debugPrint("🍎 setupFoodRendered called:")
+        DebugConfig.debugPrint("   - currentCalories: \(currentCalories)")
+        DebugConfig.debugPrint("   - currentFoodCount: \(currentFoodCount)")
+        DebugConfig.debugPrint("   - petData exists: \(petData != nil)")
+        DebugConfig.debugPrint("   - pet stage: \(petData?.stage.displayName ?? "nil")")
+        
         // Don't render food stages for eggs
         guard let petData = self.petData, petData.stage != .egg else {
             DebugConfig.debugPrint("🥚 Egg stage detected - skipping food rendering")
@@ -214,37 +220,60 @@ class ProgressScene: SKScene {
         
         var foodStagesToRender: [Int] = []
         
+        DebugConfig.debugPrint("🍎 Determining food stages to render...")
+        
         // Fix the logical operators - use && instead of ||
         if currentCalories > 200 && currentCalories <= 400 {
+            DebugConfig.debugPrint("   - Calories range: 201-400")
             if currentFoodCount == 0 {
                 foodStagesToRender = [1]
+                DebugConfig.debugPrint("   - Feed count 0: showing stage 1")
             } else {
                 foodStagesToRender = []
+                DebugConfig.debugPrint("   - Feed count \(currentFoodCount): showing no food")
             }
         } else if currentCalories > 400 && currentCalories <= 600 {
+            DebugConfig.debugPrint("   - Calories range: 401-600")
             if currentFoodCount == 0 {
                 foodStagesToRender = [1, 2]
+                DebugConfig.debugPrint("   - Feed count 0: showing stages 1,2")
             } else if currentFoodCount == 1 {
                 foodStagesToRender = [2]
+                DebugConfig.debugPrint("   - Feed count 1: showing stage 2")
             } else {
                 foodStagesToRender = []
+                DebugConfig.debugPrint("   - Feed count \(currentFoodCount): showing no food")
             }
         } else if currentCalories > 600 {
+            DebugConfig.debugPrint("   - Calories range: 600+")
             if currentFoodCount == 0 {
                 foodStagesToRender = [1, 2, 3]
+                DebugConfig.debugPrint("   - Feed count 0: showing stages 1,2,3")
             } else if currentFoodCount == 1 {
                 foodStagesToRender = [2, 3]
+                DebugConfig.debugPrint("   - Feed count 1: showing stages 2,3")
             } else if currentFoodCount == 2 {
                 foodStagesToRender = [3]
+                DebugConfig.debugPrint("   - Feed count 2: showing stage 3")
             } else {
                 foodStagesToRender = []
+                DebugConfig.debugPrint("   - Feed count \(currentFoodCount): showing no food")
             }
+        } else {
+            DebugConfig.debugPrint("   - Calories \(currentCalories) <= 200: no food stages")
         }
+        
+        DebugConfig.debugPrint("🍎 Final food stages to render: \(foodStagesToRender)")
         
         // Actually render the food sprites
         for (index, stage) in foodStagesToRender.enumerated() {
-            let foodTexture = SKTexture(imageNamed: "Food/food-stage-\(stage)")
+            let foodTextureName = "Food/food-stage-\(stage)"
+            DebugConfig.debugPrint("🍎 Attempting to load: \(foodTextureName)")
+            
+            let foodTexture = SKTexture(imageNamed: foodTextureName)
             if foodTexture.size() != CGSize.zero {
+                DebugConfig.debugPrint("✅ Successfully loaded \(foodTextureName), size: \(foodTexture.size())")
+                
                 let foodSprite = SKSpriteNode(texture: foodTexture)
                 
                 // Position food items on the plate - first item is always centered
@@ -266,9 +295,12 @@ class ProgressScene: SKScene {
                     yOffset = 10
                 }
                 
-                foodSprite.position = CGPoint(x: xOffset, y: -60 + yOffset)
+                let finalPosition = CGPoint(x: xOffset, y: -60 + yOffset)
+                foodSprite.position = finalPosition
                 foodSprite.zPosition = 0
-                foodSprite.setScale(0.5) // Scale food smaller than the plate
+                foodSprite.setScale(0.2) // Scale food smaller than the plate
+                
+                DebugConfig.debugPrint("🍎 Positioned food stage \(stage) at: \(finalPosition), scale: 2")
                 
                 // Give the food sprite a name for identification
                 foodSprite.name = "food-stage-\(stage)"
@@ -278,10 +310,15 @@ class ProgressScene: SKScene {
                 
                 addChild(foodSprite)
                 foodSprites.append(foodSprite)
+                
+                DebugConfig.debugPrint("✅ Successfully added food sprite \(stage) to scene")
             } else {
-                DebugConfig.debugPrint("Failed to load food texture: food-stage-\(stage)")
+                DebugConfig.debugPrint("❌ Failed to load food texture: \(foodTextureName) - texture size is zero")
             }
         }
+        
+        DebugConfig.debugPrint("🍎 Food rendering complete. Total food sprites: \(foodSprites.count)")
+        DebugConfig.debugPrint("🍎 Food sprites in scene: \(foodSprites.map { $0.name ?? "unnamed" })")
     }
 
     // Helper function to get current target based on calories
@@ -341,6 +378,8 @@ class ProgressScene: SKScene {
     func updateProgress(current: Int) {
         currentCalories = current
         
+        DebugConfig.debugPrint("📊 updateProgress called with: \(current) calories")
+        
         // Update label with current target
         let currentTarget = getCurrentTarget(for: currentCalories)
         
@@ -364,6 +403,7 @@ class ProgressScene: SKScene {
         
         // Update food display based on current calories and pet's food count
         let currentFoodCount = petData?.getCurrentDayFeedCount() ?? 0
+        DebugConfig.debugPrint("📊 About to call setupFoodRendered with calories: \(currentCalories), feedCount: \(currentFoodCount)")
         setupFoodRendered(currentCalories: currentCalories, currentFoodCount: currentFoodCount)
         
         // Update notification with current calories

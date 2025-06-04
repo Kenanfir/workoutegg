@@ -9,6 +9,9 @@ class HealthKitManager: ObservableObject {
     private var updateTimer: Timer?
     private var petData: PetData?
     
+    // Add completion callback for when data is loaded
+    var onDataLoaded: (() -> Void)?
+    
     init() {
         requestAuthorization()
         setupPeriodicUpdates()
@@ -124,6 +127,7 @@ class HealthKitManager: ObservableObject {
                 self.caloriesBurned = calories
                 self.updateCumulativeCalories()
                 DebugConfig.debugPrint("📱 HealthKit: Updated caloriesBurned to \(self.caloriesBurned)")
+                self.onDataLoaded?()
             }
         }
         
@@ -155,6 +159,7 @@ class HealthKitManager: ObservableObject {
                     DebugConfig.debugPrint("🔄 Fallback: Using today's calories (\(self.caloriesBurned)) for egg cumulative")
                     self.cumulativeCalories = self.caloriesBurned
                     self.petData?.updateCumulativeCalories(todayCalories: self.caloriesBurned, cumulativeCalories: self.caloriesBurned)
+                    self.onDataLoaded?()
                 }
                 return
             }
@@ -167,6 +172,7 @@ class HealthKitManager: ObservableObject {
                     DebugConfig.debugPrint("🔄 Fallback: No cumulative data, using today's calories (\(self.caloriesBurned))")
                     self.cumulativeCalories = self.caloriesBurned
                     self.petData?.updateCumulativeCalories(todayCalories: self.caloriesBurned, cumulativeCalories: self.caloriesBurned)
+                    self.onDataLoaded?()
                 }
                 return
             }
@@ -180,6 +186,7 @@ class HealthKitManager: ObservableObject {
                 
                 // Update the pet data with both values
                 self.petData?.updateCumulativeCalories(todayCalories: self.caloriesBurned, cumulativeCalories: cumulativeCalories)
+                self.onDataLoaded?()
             }
         }
         

@@ -309,6 +309,7 @@ class PetData {
         }
     }
     
+    // Evolution Condition (Requirements)
     func isReadyToEvolve() -> Bool {
         DebugConfig.debugPrint("🔍 Checking evolution readiness:")
         DebugConfig.debugPrint("   - Current stage: \(stage.displayName)")

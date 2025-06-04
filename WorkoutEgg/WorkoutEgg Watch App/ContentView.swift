@@ -265,6 +265,14 @@ struct ContentView: View {
                         gameSceneOverlay
                     }
                 }
+                .onAppear {
+                    // Force refresh HealthKit data and update evolution button when GameScene appears
+                    healthKitManager.fetchTodayCalories()
+                    // Add a small delay to ensure HealthKit data is processed before checking evolution
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        gameScene.updateEvolutionButton()
+                    }
+                }
         }
         .frame(width: 300, height: 300)
         .containerBackground(for: .tabView) {
@@ -336,9 +344,11 @@ struct ContentView: View {
                         }
                         .onChange(of: healthKitManager.cumulativeCalories) { _ in
                             updateProgressDisplay()
+                            gameScene.updateEvolutionButton()
                         }
                         .onChange(of: healthKitManager.caloriesBurned) { _ in
                             updateProgressDisplay()
+                            gameScene.updateEvolutionButton()
                         }
                         .ignoresSafeArea()
                 }

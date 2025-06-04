@@ -108,23 +108,17 @@ class GameScene: SKScene {
         }
     }
     
+    // Function to render evolution button
     private func setupEvolutionButton() {
-        // Create evolution button background
-        evolutionButton = SKSpriteNode(color: .green, size: CGSize(width: 60, height: 20))
-        evolutionButton!.position = CGPoint(x: 0, y: 30)
+        // Create evolution button using image asset
+        evolutionButton = SKSpriteNode(imageNamed: "evo-btn")
+        evolutionButton!.position = CGPoint(x: 0, y: -25)
         evolutionButton!.zPosition = 10
         evolutionButton!.name = "evolution_button"
         
-        // Create evolution button label
-        evolutionLabel = SKLabelNode(fontNamed: "VCROSDMono")
-        evolutionLabel!.text = "EVOLVE!"
-        evolutionLabel!.fontSize = 8
-        evolutionLabel!.fontColor = .white
-        evolutionLabel!.position = CGPoint(x: 0, y: -3) // Slightly offset for centering
-        evolutionLabel!.zPosition = 11
-        evolutionLabel!.name = "evolution_label"
+        // Scale the button if needed (adjust this value to make it larger/smaller)
+        evolutionButton!.setScale(1)
         
-        evolutionButton!.addChild(evolutionLabel!)
         addChild(evolutionButton!)
         
         // Initially hide the button
@@ -133,7 +127,7 @@ class GameScene: SKScene {
         DebugConfig.debugPrint("Evolution button created and hidden")
     }
     
-    private func updateEvolutionButton() {
+    func updateEvolutionButton() {
         guard let petData = self.petData,
               let button = evolutionButton else { return }
         
@@ -185,6 +179,50 @@ class GameScene: SKScene {
         guard let petData = self.petData else { return }
         
         DebugConfig.debugPrint("🌟 Evolution button tapped!")
+        
+        // Check if this is an egg evolution to play special hatch animation
+        if petData.stage == .egg && petData.isReadyToEvolve() {
+            playEggHatchAnimation {
+                // Complete the evolution after animation
+                self.completeEvolution()
+            }
+        } else {
+            // For other stages, evolve normally
+            completeEvolution()
+        }
+    }
+    
+    private func playEggHatchAnimation(completion: @escaping () -> Void) {
+        guard let pet = childNode(withName: "pet") as? SKSpriteNode else {
+            completion()
+            return
+        }
+        
+        DebugConfig.debugPrint("🥚 Playing egg hatch animation")
+        
+        // Create animation frames
+        let frame1 = SKTexture(imageNamed: "Egg/egg-2-wo-cracked1")
+        let frame2 = SKTexture(imageNamed: "Egg/egg-2-wo-cracked2")
+        let frames = [frame1, frame2]
+        
+        // Create animation action
+        let animateAction = SKAction.animate(with: frames, timePerFrame: 0.3)
+        let repeatAnimation = SKAction.repeat(animateAction, count: 2) // Play twice
+        
+        // Create completion action
+        let completionAction = SKAction.run {
+            completion()
+        }
+        
+        // Combine animation and completion
+        let sequence = SKAction.sequence([repeatAnimation, completionAction])
+        
+        // Run the animation on the pet sprite
+        pet.run(sequence)
+    }
+    
+    private func completeEvolution() {
+        guard let petData = self.petData else { return }
         
         if petData.tryNaturalEvolution() {
             // Evolution successful

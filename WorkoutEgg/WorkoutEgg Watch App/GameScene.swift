@@ -31,7 +31,7 @@ class GameScene: SKScene {
         background.position = CGPoint(x: 0, y: 0)
         background.zPosition = -1 // Place it behind other elements
         
-        background.setScale(1)
+        background.setScale(0.2)
         
         addChild(background)
         isUserInteractionEnabled = true
@@ -204,7 +204,7 @@ class GameScene: SKScene {
         evolutionButton!.name = "evolution_button"
         
         // Scale the button if needed (adjust this value to make it larger/smaller)
-        evolutionButton!.setScale(1)
+        evolutionButton!.setScale(0.2)
         
         addChild(evolutionButton!)
         

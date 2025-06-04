@@ -20,7 +20,7 @@ class ProgressScene: SKScene {
     private var emptyPlateSprite: SKSpriteNode?
     private var foodSprites: [SKSpriteNode] = []
 
-    private let barScale: CGFloat = 1
+    private let barScale: CGFloat = 0.5
     
     // Initialize with PetData
     init(petData: PetData?) {
@@ -34,7 +34,36 @@ class ProgressScene: SKScene {
     
     // Method to update pet data reference
     func setPetData(_ petData: PetData?) {
+        let previousStage = self.petData?.stage
         self.petData = petData
+        
+        // If stage changed, update positioning
+        if let newStage = petData?.stage, newStage != previousStage {
+            updateElementPositions()
+        }
+    }
+
+    /// Updates the positions of UI elements based on the current pet stage
+    private func updateElementPositions() {
+        guard let petData = self.petData else { return }
+        
+        let isEgg = petData.stage == .egg
+        let progressBarY: CGFloat = isEgg ? -10 : 30
+        let caloriesLabelY: CGFloat = isEgg ? 20 : 60
+        let stageLabelY: CGFloat = isEgg ? 40 : 80
+        
+        // Update progress bar positions
+        emptyBar?.position = CGPoint(x: 0, y: progressBarY)
+        cropNode?.position = CGPoint(x: 0, y: progressBarY)
+        
+        // Update label positions
+        caloriesLabel?.position = CGPoint(x: 0, y: caloriesLabelY)
+        stageLabel?.position = CGPoint(x: 0, y: stageLabelY)
+        
+        DebugConfig.debugPrint("🔄 Updated element positions for stage: \(petData.stage.displayName)")
+        DebugConfig.debugPrint("   - Progress bar: y=\(progressBarY)")
+        DebugConfig.debugPrint("   - Calories label: y=\(caloriesLabelY)")
+        DebugConfig.debugPrint("   - Stage label: y=\(stageLabelY)")
     }
 
     override func sceneDidLoad() {
@@ -50,7 +79,7 @@ class ProgressScene: SKScene {
         }
         background.position = CGPoint(x: 0, y: 0)
         background.zPosition = -1
-        background.setScale(1)
+        background.setScale(0.5)
         addChild(background)
 
         isUserInteractionEnabled = true
@@ -72,6 +101,8 @@ class ProgressScene: SKScene {
         setupProgressBar()
         if let petData = petData, petData.stage != .egg {
             setupEmptyPlate()
+        } else {
+            DebugConfig.debugPrint("🥚 Egg stage detected - skipping empty plate setup")
         }
         
         // Use pet data's current food count
@@ -87,9 +118,12 @@ class ProgressScene: SKScene {
         self.barWidth = originalBarWidth * barScale
         let barHeight = originalBarHeight * barScale
 
+        // Position progress bar based on pet stage
+        let progressBarY: CGFloat = (petData?.stage == .egg) ? -10 : 30
+
         emptyBar = SKSpriteNode(texture: emptyBarTexture)
         emptyBar!.size = CGSize(width: barWidth, height: barHeight)
-        emptyBar!.position = CGPoint(x: 0, y: 30)
+        emptyBar!.position = CGPoint(x: 0, y: progressBarY)
         emptyBar!.zPosition = 0
         addChild(emptyBar!)
 
@@ -108,9 +142,11 @@ class ProgressScene: SKScene {
         cropNode = SKCropNode()
         cropNode!.maskNode = maskNode
         cropNode!.addChild(filledBar!)
-        cropNode!.position = CGPoint(x: 0, y: 30)
+        cropNode!.position = CGPoint(x: 0, y: progressBarY)
         cropNode!.zPosition = 1
         addChild(cropNode!)
+        
+        DebugConfig.debugPrint("🎯 Progress bar positioned at y: \(progressBarY) for stage: \(petData?.stage.displayName ?? "unknown")")
     }
 
     private func setupEmptyPlate() {
@@ -126,16 +162,20 @@ class ProgressScene: SKScene {
         emptyPlateSprite = SKSpriteNode(texture: plateTexture)
         emptyPlateSprite!.position = CGPoint(x: 0, y: -60) // Position under the progress bar
         emptyPlateSprite!.zPosition = -0.5 // Behind progress bar but in front of background
-        emptyPlateSprite!.setScale(1) // Same scale as progress bar
+        emptyPlateSprite!.setScale(0.2) // Same scale as progress bar
         addChild(emptyPlateSprite!)
     }
 
     private func setupCaloriesLabel() {
+        // Position labels based on pet stage
+        let caloriesLabelY: CGFloat = (petData?.stage == .egg) ? 20 : 60
+        let stageLabelY: CGFloat = (petData?.stage == .egg) ? 40 : 80
+
         caloriesLabel = SKLabelNode(fontNamed: "VCROSDMono")
         caloriesLabel!.fontSize = 16
         caloriesLabel!.fontColor = UIColor(Color("Light1"))
-        caloriesLabel!.position = CGPoint(x: 0, y: 60)
-        caloriesLabel!.text = "0 / 400 KCal"
+        caloriesLabel!.position = CGPoint(x: 0, y: caloriesLabelY)
+        caloriesLabel!.text = "0 / 200 KCal"
         caloriesLabel!.zPosition = 1
         addChild(caloriesLabel!)
         
@@ -143,10 +183,20 @@ class ProgressScene: SKScene {
         stageLabel = SKLabelNode(fontNamed: "VCROSDMono")
         stageLabel!.fontSize = 12
         stageLabel!.fontColor = UIColor(Color("Light1")).withAlphaComponent(0.8)
-        stageLabel!.position = CGPoint(x: 0, y: 80)
+        stageLabel!.position = CGPoint(x: 0, y: stageLabelY)
         stageLabel!.text = "Stage 1 of 3"
         stageLabel!.zPosition = 1
+        
+        // Hide stage label for eggs, show for normal pets
+        if let petData = self.petData, petData.stage == .egg {
+            stageLabel!.isHidden = true
+        } else {
+            stageLabel!.isHidden = false
+        }
+        
         addChild(stageLabel!)
+        
+        DebugConfig.debugPrint("🏷️ Labels positioned - Calories: y=\(caloriesLabelY), Stage: y=\(stageLabelY) for stage: \(petData?.stage.displayName ?? "unknown")")
     }
     
     private func setupFoodRendered(currentCalories: Int, currentFoodCount: Int) {
@@ -155,6 +205,12 @@ class ProgressScene: SKScene {
             foodSprite.removeFromParent()
         }
         foodSprites.removeAll()
+        
+        // Don't render food stages for eggs
+        guard let petData = self.petData, petData.stage != .egg else {
+            DebugConfig.debugPrint("🥚 Egg stage detected - skipping food rendering")
+            return
+        }
         
         var foodStagesToRender: [Int] = []
         
@@ -212,7 +268,7 @@ class ProgressScene: SKScene {
                 
                 foodSprite.position = CGPoint(x: xOffset, y: -60 + yOffset)
                 foodSprite.zPosition = 0
-                foodSprite.setScale(1) // Scale food smaller than the plate
+                foodSprite.setScale(0.5) // Scale food smaller than the plate
                 
                 // Give the food sprite a name for identification
                 foodSprite.name = "food-stage-\(stage)"
@@ -230,6 +286,12 @@ class ProgressScene: SKScene {
 
     // Helper function to get current target based on calories
     private func getCurrentTarget(for calories: Int) -> Int {
+        // For eggs, the target is always 400 KCal (evolution requirement)
+        if let petData = self.petData, petData.stage == .egg {
+            return 200
+        }
+        
+        // For normal pets, use the progressive system
         if calories <= 200 {
             return 200
         } else if calories <= 400 {
@@ -241,6 +303,12 @@ class ProgressScene: SKScene {
     
     // Helper function to calculate progress for current stage
     private func getStageProgress(for calories: Int) -> CGFloat {
+        // For eggs, progress is simply calories/200 (updated evolution requirement)
+        if let petData = self.petData, petData.stage == .egg {
+            return min(CGFloat(calories) / 200.0, 1.0)
+        }
+        
+        // For normal pets, use the stage-based system
         if calories <= 0 {
             return 0.0
         } else if calories <= 200 {
@@ -275,10 +343,18 @@ class ProgressScene: SKScene {
         
         // Update label with current target
         let currentTarget = getCurrentTarget(for: currentCalories)
-        let currentStage = getCurrentStage(for: currentCalories)
         
         caloriesLabel?.text = "\(currentCalories) / \(currentTarget) KCal"
-        stageLabel?.text = "Stage \(currentStage) of 3"
+        
+        // Only show stage label for non-egg pets
+        if let petData = self.petData, petData.stage == .egg {
+            stageLabel?.isHidden = true
+            DebugConfig.debugPrint("🥚 Hiding stage label for egg")
+        } else {
+            let currentStage = getCurrentStage(for: currentCalories)
+            stageLabel?.text = "Stage \(currentStage) of 3"
+            stageLabel?.isHidden = false
+        }
         
         // Calculate progress for current stage
         let progress = min(max(getStageProgress(for: currentCalories), 0.0), 1.0)

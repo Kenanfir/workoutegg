@@ -224,8 +224,20 @@ class GameScene: SKScene {
         DebugConfig.debugPrint("Evolution button visibility: \(shouldShow ? "visible" : "hidden")")
     }
     
-    func wigglePet(_ pet: SKSpriteNode) {
-        // Create a sequence of actions for the wiggle
+    func playTapAnimation(_ pet: SKSpriteNode) {
+        guard let petData = self.petData else { return }
+        
+        if petData.stage == .egg {
+            // Play wiggle animation for eggs
+            wiggleEgg(pet)
+        } else {
+            // Play tapped animation for normal pets
+            playTappedAnimation(pet)
+        }
+    }
+    
+    private func wiggleEgg(_ pet: SKSpriteNode) {
+        // Create a sequence of actions for the wiggle (only for eggs)
         let rotateRight = SKAction.rotate(toAngle: .pi / 20, duration: 0.2)
         let rotateLeft = SKAction.rotate(toAngle: -.pi / 20, duration: 0.2)
         let wiggle = SKAction.sequence([rotateRight, rotateLeft])
@@ -236,7 +248,89 @@ class GameScene: SKScene {
         let fullAnimation = SKAction.sequence([repeatWiggle, returnToCenter])
         
         // Run the animation
-        pet.run(fullAnimation)
+        pet.run(fullAnimation, withKey: "tapAnimation")
+        
+        DebugConfig.debugPrint("🥚 Playing egg wiggle animation")
+    }
+    
+    private func playTappedAnimation(_ pet: SKSpriteNode) {
+        guard let petData = self.petData else { return }
+        
+        // Get tapped animation frames
+        let tappedFrames = petData.petTappedAnimationFrames
+        
+        // Create textures from tapped animation frame paths
+        var textures: [SKTexture] = []
+        for framePath in tappedFrames {
+            let texture = SKTexture(imageNamed: framePath)
+            if texture.size() != CGSize.zero {
+                textures.append(texture)
+                DebugConfig.debugPrint("Loaded tapped animation frame: \(framePath)")
+            } else {
+                DebugConfig.debugPrint("Failed to load tapped animation frame: \(framePath)")
+            }
+        }
+        
+        // Play tapped animation if we have frames
+        if textures.count > 1 {
+            // Stop current idle animation temporarily
+            pet.removeAction(forKey: "idleAnimation")
+            
+            // Create tapped animation (plays once)
+            let tappedAnimation = SKAction.animate(with: textures, timePerFrame: 0.3) // Faster than idle
+            
+            // Create completion action to restart idle animation
+            let restartIdleAnimation = SKAction.run { [weak self] in
+                self?.restartIdleAnimation(pet)
+            }
+            
+            // Combine tapped animation with idle restart
+            let sequence = SKAction.sequence([tappedAnimation, restartIdleAnimation])
+            
+            // Run the tapped animation
+            pet.run(sequence, withKey: "tapAnimation")
+            
+            DebugConfig.debugPrint("🎯 Playing tapped animation with \(textures.count) frames")
+        } else {
+            // Fallback to a simple scale animation if no tapped frames available
+            let scaleDown = SKAction.scale(to: 0.9, duration: 0.1)
+            let scaleUp = SKAction.scale(to: 1.0, duration: 0.1)
+            let scaleAnimation = SKAction.sequence([scaleDown, scaleUp])
+            pet.run(scaleAnimation, withKey: "tapAnimation")
+            
+            DebugConfig.debugPrint("🎯 Playing fallback scale animation (no tapped frames found)")
+        }
+    }
+    
+    private func restartIdleAnimation(_ pet: SKSpriteNode) {
+        guard let petData = self.petData else { return }
+        
+        // Only restart idle animation for non-egg pets
+        guard petData.stage != .egg else { return }
+        
+        // Get idle animation frames
+        let animationFrames = petData.petAnimationFrames
+        var textures: [SKTexture] = []
+        for framePath in animationFrames {
+            let texture = SKTexture(imageNamed: framePath)
+            if texture.size() != CGSize.zero {
+                textures.append(texture)
+            }
+        }
+        
+        // Restart idle animation if we have frames
+        if textures.count > 1 {
+            let idleAnimation = SKAction.animate(with: textures, timePerFrame: 0.5)
+            let repeatForever = SKAction.repeatForever(idleAnimation)
+            pet.run(repeatForever, withKey: "idleAnimation")
+            DebugConfig.debugPrint("🔄 Restarted idle animation after tap")
+        }
+    }
+    
+    // Legacy wiggle function - now only used internally for eggs
+    func wigglePet(_ pet: SKSpriteNode) {
+        // Redirect to new tap animation system
+        playTapAnimation(pet)
     }
     
     // Method to handle tap points from SwiftUI
@@ -344,8 +438,8 @@ class GameScene: SKScene {
         // Show success indicator
         showTapIndicator(at: location, success: true)
         
-        // Wiggle the pet
-        wigglePet(pet)
+        // Play appropriate tap animation (wiggle for eggs, tapped animation for pets)
+        playTapAnimation(pet)
         
         // Update evolution button in case pet became ready to evolve
         updateEvolutionButton()

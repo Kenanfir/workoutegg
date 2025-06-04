@@ -160,6 +160,20 @@ class PetData {
         }
     }
     
+    /// Returns all tapped animation frame paths for the current pet state
+    var petTappedAnimationFrames: [String] {
+        switch stage {
+        case .egg:
+            // Eggs don't have tapped animation frames, return single static image
+            return ["Egg/egg-2-wo-normal"]
+        case .baby, .child, .teen, .adult, .elder:
+            // Return all 4 animation frames for tapped animation
+            return (1...4).map { frameNumber in
+                "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)TappedFr\(frameNumber)"
+            }
+        }
+    }
+    
     /// Returns a specific animation frame for the current pet state
     func getPetAnimationFrame(_ frameNumber: Int) -> String {
         switch stage {
@@ -168,6 +182,17 @@ class PetData {
         case .baby, .child, .teen, .adult, .elder:
             let clampedFrame = max(1, min(4, frameNumber)) // Ensure frame is between 1-4
             return "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)IdleFr\(clampedFrame)"
+        }
+    }
+    
+    /// Returns a specific tapped animation frame for the current pet state
+    func getPetTappedAnimationFrame(_ frameNumber: Int) -> String {
+        switch stage {
+        case .egg:
+            return "Egg/egg-2-wo-normal"
+        case .baby, .child, .teen, .adult, .elder:
+            let clampedFrame = max(1, min(4, frameNumber)) // Ensure frame is between 1-4
+            return "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)TappedFr\(clampedFrame)"
         }
     }
     

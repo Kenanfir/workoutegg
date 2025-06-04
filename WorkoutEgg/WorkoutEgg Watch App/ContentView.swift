@@ -299,7 +299,14 @@ struct ContentView: View {
             
             // Show current animation info
             if DebugConfig.shouldShowDebugUI {
-                Text("Animation: \(getCurrentPet().petAnimationFrames.first ?? "None")")
+                Text("Idle: \(getCurrentPet().petAnimationFrames.first ?? "None")")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .background(Color.black.opacity(0.6))
+                    .cornerRadius(6)
+                
+                Text("Tapped: \(getCurrentPet().petTappedAnimationFrames.first ?? "None")")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 8)

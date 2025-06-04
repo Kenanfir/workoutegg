@@ -235,6 +235,8 @@ class PetData {
             missedDaysCount = 0
         }
         
+        addCaloriesConsumed()
+        
         // Always increment today's feed count (for UI feedback)
         incrementTodayFeedCount()
         
@@ -249,12 +251,11 @@ class PetData {
         
         // Only increment age and streak if the pet hasn't been fed today
         if !calendar.isDate(dateTemp, inSameDayAs: today) {
-            age += 1
+            let daysPassed = calendar.dateComponents([.day], from: dateTemp, to: today).day ?? 0
+            age += daysPassed
             dateTemp = today
             caloriesTemp = 0
         }
-        
-        addCaloriesConsumed()
         
         // Update emotion based on streak
         updateEmotion()
@@ -265,9 +266,9 @@ class PetData {
     }
     
     func addCaloriesConsumed() {
-        let calories: Double = cumulativeCalories + caloriesTemp
-        caloriesTemp = cumulativeCalories
+        let calories: Double = cumulativeCalories - caloriesTemp
         totalCaloriesConsumed += calories
+        caloriesTemp = cumulativeCalories
     }
     
     func checkMissedFed() -> Bool {
@@ -457,14 +458,14 @@ class PetData {
         guard isReadyToEvolve() else { return false }
         
         let previousStage = stage
-        let previousCumulativeCalories = cumulativeCalories
+//        let previousCumulativeCalories = cumulativeCalories
         
         // Perform the evolution
         switch stage {
         case .egg:
             stage = .baby
             // Transfer accumulated calories to totalCaloriesConsumed when hatching
-            totalCaloriesConsumed += cumulativeCalories
+//            totalCaloriesConsumed += cumulativeCalories
             DebugConfig.debugPrint("🥚➡️🐣 Egg hatched! Transferred \(cumulativeCalories) calories to totalCaloriesConsumed")
         case .baby:
             stage = .child
@@ -497,14 +498,14 @@ class PetData {
         if isDead { return }
         
         let previousStage = stage
-        let previousCumulativeCalories = cumulativeCalories
+//        let previousCumulativeCalories = cumulativeCalories
         
         // Force evolution to next stage (bypassing normal requirements)
         switch stage {
         case .egg:
             stage = .baby
             // Transfer accumulated calories to totalCaloriesConsumed when hatching (even for force evolution)
-            totalCaloriesConsumed += cumulativeCalories
+//            totalCaloriesConsumed += cumulativeCalories
             DebugConfig.debugPrint("🥚➡️🐣 Force hatched! Transferred \(cumulativeCalories) calories to totalCaloriesConsumed")
         case .baby:
             stage = .child

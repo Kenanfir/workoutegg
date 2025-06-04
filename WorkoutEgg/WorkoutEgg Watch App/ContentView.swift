@@ -198,11 +198,11 @@ struct ContentView: View {
             // Set up the connection between ProgressScene and PetData
             progressScene.setPetData(pet)
             
-            // Check for missed workouts when app opens
-            pet.runAtStartOfApp()
-            
             // Force refresh HealthKit data (callback will handle evolution button update)
             healthKitManager.fetchTodayCalories()
+            
+            // Check for missed workouts when app opens
+            pet.runAtStartOfApp()
         }
         .onChange(of: pets) { oldValue, newValue in
             // Update currentPet when pets query changes

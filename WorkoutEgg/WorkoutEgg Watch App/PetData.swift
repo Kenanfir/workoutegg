@@ -111,6 +111,7 @@ class PetData {
     var cumulativeCalories: Double
     var lastCalorieResetDate: Date
     var totalCaloriesConsumed: Double
+    var caloriesTemp: Double
     var isActive: Bool
     var createdDate: Date
     var isDead: Bool // New: Track if pet has died
@@ -118,6 +119,7 @@ class PetData {
     var currentDayCalories: Double // New: Track current day's calories from HealthKit
     var currentDayFeedCount: Int // New: Track current day's feed interactions
     var lastFeedResetDate: Date // New: Track when feed count was last reset
+    var dateTemp: Date
     
     // Computed properties
     var ageInDays: String {
@@ -198,7 +200,7 @@ class PetData {
     
     init(age: Int = 1, streak: Int = 0, evoPoints: Int = 0, species: PetSpecies = .kikimora,
          stage: PetStage = .egg, emotion: PetEmotion = .content, lastFedDate: Date = Date(),
-         cumulativeCalories: Double = 0, lastCalorieResetDate: Date = Date(),
+         cumulativeCalories: Double = 0, lastCalorieResetDate: Date = Date(), caloriesTemp: Double = 0,
          totalCaloriesConsumed: Double = 0, isActive: Bool = true, createdDate: Date = Date(),
          isDead: Bool = false, missedDaysCount: Int = 0) {
         self.age = age
@@ -211,6 +213,7 @@ class PetData {
         self.cumulativeCalories = cumulativeCalories
         self.lastCalorieResetDate = lastCalorieResetDate
         self.totalCaloriesConsumed = totalCaloriesConsumed
+        self.caloriesTemp = caloriesTemp
         self.isActive = isActive
         self.createdDate = createdDate
         self.isDead = isDead
@@ -218,6 +221,7 @@ class PetData {
         self.currentDayCalories = 0 // Initialize to 0
         self.currentDayFeedCount = 0 // Initialize to 0
         self.lastFeedResetDate = Date() // Initialize to current date
+        self.dateTemp = Date()
     }
     
     func updateAfterFed() {
@@ -227,7 +231,6 @@ class PetData {
         // Only increment age and streak if the pet hasn't been fed today
         if !calendar.isDate(lastFedDate, inSameDayAs: today) {
             streak += 1
-            age += 1
             lastFedDate = today
             missedDaysCount = 0
         }
@@ -240,11 +243,30 @@ class PetData {
         
     }
     
+    func runAtStartOfApp() {
+        let calendar = Calendar.current
+        let today = Date()
+        
+        // Only increment age and streak if the pet hasn't been fed today
+        if !calendar.isDate(dateTemp, inSameDayAs: today) {
+            age += 1
+            dateTemp = today
+            caloriesTemp = 0
+        }
+        
+        addCaloriesConsumed()
+        
+        // Update emotion based on streak
+        updateEmotion()
+    }
+    
     func calculateEvoPoints() -> Int {
         return 0
     }
     
-    func addCaloriesConsumed(_ calories: Double) {
+    func addCaloriesConsumed() {
+        let calories: Double = cumulativeCalories + caloriesTemp
+        caloriesTemp = cumulativeCalories
         totalCaloriesConsumed += calories
     }
     

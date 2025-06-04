@@ -162,11 +162,12 @@ struct ContentView: View {
     
     var body: some View {
         Group {
-            if !hasCompletedOnboarding {
-                OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
-            } else {
-                mainTabView
-            }
+//            if !hasCompletedOnboarding {
+//                OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
+//            } else {
+//                mainTabView
+//            }
+            mainTabView
         }
         .onAppear {
             // Initialize petManager with the real context
@@ -189,7 +190,7 @@ struct ContentView: View {
             progressScene.setPetData(pet)
             
             // Check for missed workouts when app opens
-            pet.checkMissedFed()
+            pet.runAtStartOfApp()
         }
         .onChange(of: pets) { oldValue, newValue in
             // Update currentPet when pets query changes

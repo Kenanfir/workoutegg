@@ -11,8 +11,8 @@ import SwiftData
 // MARK: - Data Models
 
 enum PetSpecies: String, CaseIterable, Codable {
-    case fufufafa = "FUFUFAFA"
     case kikimora = "KIKIMORA"
+    case fufufafa = "FUFUFAFA"
     case bubbles = "BUBBLES"
     case sparkle = "SPARKLE"
     
@@ -121,7 +121,7 @@ class PetData {
         }
     }
     
-    init(age: Int = 1, streak: Int = 0, evoPoints: Int = 0, species: PetSpecies = .fufufafa,
+    init(age: Int = 1, streak: Int = 0, evoPoints: Int = 0, species: PetSpecies = .kikimora,
          stage: PetStage = .egg, emotion: PetEmotion = .content, lastFedDate: Date = Date(),
          cumulativeCalories: Double = 0, lastCalorieResetDate: Date = Date(),
          totalCaloriesConsumed: Double = 0, isActive: Bool = true, createdDate: Date = Date(),
@@ -189,9 +189,9 @@ class PetData {
                 emotion = .sad
                 return true // Indicates pet died
             } else {
-                // Pet is sad but still alive
+                // Pet missed some days but still alive - reset streak and update emotion based on new streak
                 streak = 0
-                emotion = .sad
+                updateEmotion() // Use the emotion logic based on current streak
             }
         }
         
@@ -296,16 +296,18 @@ class PetData {
         if isDead { return }
         
         switch streak {
-        case 0...5:
+        case 3...5:
             emotion = .sad
         case 6...20:
-            emotion = .content
+            emotion = .sleepy
         case 21...50:
             emotion = .happy
         case 51...100:
             emotion = .excited
-        default:
+        case 101...150:
             emotion = .tantrum
+        default :
+            emotion = .content
         }
     }
     

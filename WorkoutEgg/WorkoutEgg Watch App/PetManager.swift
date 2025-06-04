@@ -41,7 +41,7 @@ class PetManager: ObservableObject {
         return try? context.fetch(request).first
     }
     
-    func createNewPet(species: PetSpecies = .fufufafa) -> PetData {
+    func createNewPet(species: PetSpecies = .kikimora) -> PetData {
         // Deactivate any existing active pets
         let activeRequest = FetchDescriptor<PetData>(
             predicate: #Predicate { $0.isActive }

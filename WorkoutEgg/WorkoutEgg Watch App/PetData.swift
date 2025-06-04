@@ -121,7 +121,7 @@ class PetData {
         }
     }
     
-    init(age: Int = 0, streak: Int = 0, evoPoints: Int = 0, species: PetSpecies = .fufufafa,
+    init(age: Int = 1, streak: Int = 0, evoPoints: Int = 0, species: PetSpecies = .fufufafa,
          stage: PetStage = .egg, emotion: PetEmotion = .content, lastFedDate: Date = Date(),
          cumulativeCalories: Double = 0, lastCalorieResetDate: Date = Date(),
          totalCaloriesConsumed: Double = 0, isActive: Bool = true, createdDate: Date = Date(),
@@ -221,6 +221,7 @@ class PetData {
         DebugConfig.debugPrint("   - cumulativeCalories param: \(cumulativeCalories ?? -1)")
         DebugConfig.debugPrint("   - Current pet cumulativeCalories: \(self.cumulativeCalories)")
         DebugConfig.debugPrint("   - Current totalCaloriesConsumed: \(self.totalCaloriesConsumed)")
+        DebugConfig.debugPrint("   - Setting currentDayCalories to: \(todayCalories)")
         
         if !calendar.isDate(lastCalorieResetDate, inSameDayAs: today) {
             if stage == .egg {
@@ -251,6 +252,7 @@ class PetData {
         }
         
         DebugConfig.debugPrint("   - Final pet cumulativeCalories: \(self.cumulativeCalories)")
+        DebugConfig.debugPrint("   - Final currentDayCalories: \(self.currentDayCalories)")
         DebugConfig.debugPrint("   - Final totalCaloriesConsumed: \(self.totalCaloriesConsumed)")
     }
     
@@ -312,32 +314,37 @@ class PetData {
         DebugConfig.debugPrint("   - Current stage: \(stage.displayName)")
         DebugConfig.debugPrint("   - Current age: \(age) days")
         DebugConfig.debugPrint("   - Current cumulativeCalories: \(cumulativeCalories)")
+        DebugConfig.debugPrint("   - Current currentDayCalories: \(currentDayCalories)")
+        
+        let readyToEvolve: Bool
         
         switch stage {
         case .egg:
-            let readyToEvolve = cumulativeCalories >= 200
-            DebugConfig.debugPrint("   - Egg evolution check: \(cumulativeCalories) >= 200 = \(readyToEvolve)")
+            readyToEvolve = currentDayCalories >= 200
+            DebugConfig.debugPrint("   - Egg evolution check: \(currentDayCalories) >= 200 = \(readyToEvolve)")
             return readyToEvolve
         case .baby:
-            let readyToEvolve = age >= 7  // 7 days as baby
+            readyToEvolve = age >= 7  // 7 days as baby
             DebugConfig.debugPrint("   - Baby evolution check: \(age) >= 7 = \(readyToEvolve)")
             return readyToEvolve
         case .child:
-            let readyToEvolve = age >= 15  // 15 days total (8 more days as child)
+            readyToEvolve = age >= 15  // 15 days total (8 more days as child)
             DebugConfig.debugPrint("   - Child evolution check: \(age) >= 15 = \(readyToEvolve)")
             return readyToEvolve
         case .teen:
-            let readyToEvolve = age >= 25  // 25 days total (10 more days as teen)
+            readyToEvolve = age >= 25  // 25 days total (10 more days as teen)
             DebugConfig.debugPrint("   - Teen evolution check: \(age) >= 25 = \(readyToEvolve)")
             return readyToEvolve
         case .adult:
-            let readyToEvolve = age >= 40  // 40 days total (15 more days as adult)
+            readyToEvolve = age >= 40  // 40 days total (15 more days as adult)
             DebugConfig.debugPrint("   - Adult evolution check: \(age) >= 40 = \(readyToEvolve)")
             return readyToEvolve
         case .elder:
             DebugConfig.debugPrint("   - Elder stage: cannot evolve further")
             break
         }
+        
+        DebugConfig.debugPrint("   - Final result: NOT ready to evolve (elder stage or no valid check)")
         return false
     }
     

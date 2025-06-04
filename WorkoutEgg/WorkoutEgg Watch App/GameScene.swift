@@ -230,7 +230,7 @@ class GameScene: SKScene {
     
     private func showEvolutionEffect() {
         // Create sparkle effect at pet position
-        let sparkle = SKSpriteNode(color: .yellow, size: CGSize(width: 5, height: 5))
+        let sparkle = SKSpriteNode(color: .yellow, size: CGSize(width: 10, height: 10))
         sparkle.position = CGPoint(x: 0, y: 0)
         sparkle.zPosition = 15
         

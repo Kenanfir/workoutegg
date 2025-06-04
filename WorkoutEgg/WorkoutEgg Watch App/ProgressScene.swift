@@ -37,9 +37,31 @@ class ProgressScene: SKScene {
         let previousStage = self.petData?.stage
         self.petData = petData
         
-        // If stage changed, update positioning
+        // If stage changed, fully recreate the UI elements
         if let newStage = petData?.stage, newStage != previousStage {
+            DebugConfig.debugPrint("🔄 Pet stage changed from \(previousStage?.displayName ?? "nil") to \(newStage.displayName)")
+            
+            // Use comprehensive cleanup method
+            cleanupProgressBarElements()
+            
+            // Recreate progress bar with new positioning
+            setupProgressBar()
+            
+            // Setup empty plate for non-egg stages
+            if newStage != .egg {
+                setupEmptyPlate()
+            }
+            
+            // Update label positions
             updateElementPositions()
+            
+            // Update progress with current calories
+            let displayCalories = newStage == .egg ?
+                Int(petData?.cumulativeCalories ?? 0) :
+                Int(petData?.currentDayCalories ?? 0)
+            updateProgress(current: displayCalories)
+            
+            DebugConfig.debugPrint("✅ UI elements recreated for new stage: \(newStage.displayName)")
         }
     }
 
@@ -48,22 +70,19 @@ class ProgressScene: SKScene {
         guard let petData = self.petData else { return }
         
         let isEgg = petData.stage == .egg
-        let progressBarY: CGFloat = isEgg ? -10 : 30
         let caloriesLabelY: CGFloat = isEgg ? 20 : 60
         let stageLabelY: CGFloat = isEgg ? 40 : 80
-        
-        // Update progress bar positions
-        emptyBar?.position = CGPoint(x: 0, y: progressBarY)
-        cropNode?.position = CGPoint(x: 0, y: progressBarY)
         
         // Update label positions
         caloriesLabel?.position = CGPoint(x: 0, y: caloriesLabelY)
         stageLabel?.position = CGPoint(x: 0, y: stageLabelY)
         
-        DebugConfig.debugPrint("🔄 Updated element positions for stage: \(petData.stage.displayName)")
-        DebugConfig.debugPrint("   - Progress bar: y=\(progressBarY)")
+        // Show/hide stage label based on pet stage
+        stageLabel?.isHidden = isEgg
+        
+        DebugConfig.debugPrint("🔄 Updated label positions for stage: \(petData.stage.displayName)")
         DebugConfig.debugPrint("   - Calories label: y=\(caloriesLabelY)")
-        DebugConfig.debugPrint("   - Stage label: y=\(stageLabelY)")
+        DebugConfig.debugPrint("   - Stage label: y=\(stageLabelY), hidden: \(isEgg)")
     }
 
     override func sceneDidLoad() {
@@ -79,7 +98,7 @@ class ProgressScene: SKScene {
         }
         background.position = CGPoint(x: 0, y: 0)
         background.zPosition = -1
-        background.setScale(0.5)
+        background.setScale(0.6)
         addChild(background)
 
         isUserInteractionEnabled = true
@@ -90,25 +109,31 @@ class ProgressScene: SKScene {
     }
 
     override func didChangeSize(_ oldSize: CGSize) {
-        // Remove old bar and mask if they exist
-        cropNode?.removeFromParent()
-        emptyPlateSprite?.removeFromParent()
-        filledBar = nil
-        maskNode = nil
-        cropNode = nil
-        emptyPlateSprite = nil
+        // Only setup if we don't already have a progress bar
+        // or if the size change is significant enough to warrant recreation
+        if cropNode == nil || emptyBar == nil {
+            DebugConfig.debugPrint("🔄 didChangeSize: Setting up progress bar (missing elements)")
+            cleanupProgressBarElements()
+            setupProgressBar()
+            
+            // Use pet data's current food count
+            let currentFoodCount = petData?.getCurrentDayFeedCount() ?? 0
+            setupFoodRendered(currentCalories: currentCalories, currentFoodCount: currentFoodCount)
+            updateProgress(current: currentCalories)
+        } else {
+            DebugConfig.debugPrint("🔄 didChangeSize: Progress bar already exists, skipping setup")
+        }
         
-        setupProgressBar()
+        // Always ensure empty plate is set up for non-egg stages, regardless of progress bar state
         if let petData = petData, petData.stage != .egg {
-            setupEmptyPlate()
+            // Only setup if we don't already have an empty plate
+            if emptyPlateSprite == nil {
+                DebugConfig.debugPrint("🍽️ didChangeSize: Setting up empty plate for non-egg stage")
+                setupEmptyPlate()
+            }
         } else {
             DebugConfig.debugPrint("🥚 Egg stage detected - skipping empty plate setup")
         }
-        
-        // Use pet data's current food count
-        let currentFoodCount = petData?.getCurrentDayFeedCount() ?? 0
-        setupFoodRendered(currentCalories: currentCalories, currentFoodCount: currentFoodCount)
-        updateProgress(current: currentCalories)
     }
 
     private func setupProgressBar() {
@@ -499,5 +524,30 @@ class ProgressScene: SKScene {
         
         let group = SKAction.group([wiggle, scale])
         foodSprite.run(group)
+    }
+
+    // Comprehensive cleanup method for all progress bar elements
+    private func cleanupProgressBarElements() {
+        DebugConfig.debugPrint("🧹 Cleaning up progress bar elements")
+        
+        // Remove existing progress bar elements
+        cropNode?.removeFromParent()
+        emptyBar?.removeFromParent()
+        emptyPlateSprite?.removeFromParent()
+        
+        // Remove existing food sprites
+        for foodSprite in foodSprites {
+            foodSprite.removeFromParent()
+        }
+        foodSprites.removeAll()
+        
+        // Clear references
+        filledBar = nil
+        maskNode = nil
+        cropNode = nil
+        emptyBar = nil
+        emptyPlateSprite = nil
+        
+        DebugConfig.debugPrint("✅ Progress bar cleanup complete")
     }
 }

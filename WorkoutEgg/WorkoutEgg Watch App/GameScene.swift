@@ -6,18 +6,18 @@
 //
 
 import SpriteKit
-import WatchKit
 import SwiftData
+import WatchKit
 
 class GameScene: SKScene {
-    
+
     // Pet data reference
     private var petData: PetData?
-    
+
     // Evolution button
     private var evolutionButton: SKSpriteNode?
     private var evolutionLabel: SKLabelNode?
-    
+
     override func sceneDidLoad() {
         DebugConfig.debugPrint("Scene did load")
         // ngefix background X
@@ -29,49 +29,50 @@ class GameScene: SKScene {
             DebugConfig.debugPrint("Background size: \(background.size)")
         }
         background.position = CGPoint(x: 0, y: 0)
-        background.zPosition = -1 // Place it behind other elements
-        
+        background.zPosition = -1  // Place it behind other elements
+
         background.setScale(0.2)
-        
+
         addChild(background)
         isUserInteractionEnabled = true
-        scaleMode = .aspectFit // Make the scene fill the entire screen
-        anchorPoint = CGPoint(x: 0.5, y: 0.5) // Set anchor point to center
+        scaleMode = .aspectFit  // Make the scene fill the entire screen
+        anchorPoint = CGPoint(x: 0.5, y: 0.5)  // Set anchor point to center
         setupPet()
         setupEvolutionButton()
     }
-    
+
     /// Set the pet data reference and update the display
     func setPetData(_ petData: PetData) {
         self.petData = petData
         updatePetDisplay()
         updateEvolutionButton()
     }
-    
+
     /// Update the pet display when stage or species changes
     func updatePetDisplay() {
         guard let petData = self.petData else { return }
-        
+
         // Remove existing pet sprite
         childNode(withName: "pet")?.removeFromParent()
-        
+
         // Create new pet sprite with current image/animation
         setupPet()
-        
+
         // Update evolution button visibility
         updateEvolutionButton()
     }
-    
+
     /// Update only the pet animation frames (for emotion changes)
     func updatePetAnimation() {
         guard let petData = self.petData,
-              let pet = childNode(withName: "pet") as? SKSpriteNode else { return }
-        
+            let pet = childNode(withName: "pet") as? SKSpriteNode
+        else { return }
+
         // Only update animation for non-egg pets
         if petData.stage != .egg {
             // Stop current animation
             pet.removeAction(forKey: "idleAnimation")
-            
+
             // Load new animation frames
             let animationFrames = petData.petAnimationFrames
             var textures: [SKTexture] = []
@@ -81,23 +82,47 @@ class GameScene: SKScene {
                     textures.append(texture)
                 }
             }
-            
-            // Start new animation if we have frames
+
+            // Start new animation if we have frames, otherwise fallback
             if textures.count > 1 {
                 let idleAnimation = SKAction.animate(with: textures, timePerFrame: 0.5)
                 let repeatForever = SKAction.repeatForever(idleAnimation)
                 pet.run(repeatForever, withKey: "idleAnimation")
-                DebugConfig.debugPrint("Updated idle animation for emotion: \(petData.emotion.displayName)")
+                DebugConfig.debugPrint(
+                    "Updated idle animation for emotion: \(petData.emotion.displayName)")
             } else if !textures.isEmpty {
                 // Set static texture if only one frame
                 pet.texture = textures[0]
+            } else {
+                // FALLBACK: Use KikimoraBabyContent when emotion assets are missing
+                DebugConfig.debugPrint(
+                    "🔄 Fallback: Using KikimoraBabyContent for emotion \(petData.emotion.displayName)"
+                )
+                let fallbackFrames = [
+                    "Pet/KikimoraBabyContentIdleFr1",
+                    "Pet/KikimoraBabyContentIdleFr2",
+                    "Pet/KikimoraBabyContentIdleFr3",
+                    "Pet/KikimoraBabyContentIdleFr4",
+                ]
+                var fallbackTextures: [SKTexture] = []
+                for framePath in fallbackFrames {
+                    let texture = SKTexture(imageNamed: framePath)
+                    if texture.size() != CGSize.zero {
+                        fallbackTextures.append(texture)
+                    }
+                }
+                if fallbackTextures.count > 1 {
+                    let idleAnimation = SKAction.animate(with: fallbackTextures, timePerFrame: 0.5)
+                    let repeatForever = SKAction.repeatForever(idleAnimation)
+                    pet.run(repeatForever, withKey: "idleAnimation")
+                }
             }
         }
     }
-    
+
     private func setupPet() {
         DebugConfig.debugPrint("Setting up pet")
-        
+
         // Get the current pet data, fallback to default if no pet data
         guard let petData = self.petData else {
             // Fallback to egg if no pet data
@@ -105,7 +130,7 @@ class GameScene: SKScene {
             configurePetSprite(pet, imageName: "Egg/egg-2-wo-normal")
             return
         }
-        
+
         // Check if this is an egg or an animated pet
         if petData.stage == .egg {
             // Create static egg sprite
@@ -117,11 +142,11 @@ class GameScene: SKScene {
             createAnimatedPet(petData: petData)
         }
     }
-    
+
     /// Creates an animated pet using the animation frames
     private func createAnimatedPet(petData: PetData) {
         let animationFrames = petData.petAnimationFrames
-        
+
         // Create textures from animation frame paths
         var textures: [SKTexture] = []
         for framePath in animationFrames {
@@ -130,32 +155,61 @@ class GameScene: SKScene {
                 textures.append(texture)
                 DebugConfig.debugPrint("Loaded animation frame: \(framePath)")
             } else {
-                DebugConfig.debugPrint("Failed to load animation frame: \(framePath)")
+                DebugConfig.debugPrint("⚠️ Missing asset: \(framePath)")
             }
         }
-        
-        // Create sprite with first frame or fallback to static image
+
+        // Create sprite with first frame or fallback to KikimoraBabyContent
         let pet: SKSpriteNode
         if !textures.isEmpty {
             pet = SKSpriteNode(texture: textures[0])
-            
+
             // Create idle animation if we have multiple frames
             if textures.count > 1 {
-                let idleAnimation = SKAction.animate(with: textures, timePerFrame: 0.5) // 0.5 seconds per frame
+                let idleAnimation = SKAction.animate(with: textures, timePerFrame: 0.5)
                 let repeatForever = SKAction.repeatForever(idleAnimation)
                 pet.run(repeatForever, withKey: "idleAnimation")
                 DebugConfig.debugPrint("Started idle animation with \(textures.count) frames")
             }
         } else {
-            // Fallback to static image if animation frames fail to load
-            let fallbackImageName = petData.petImageName
-            pet = SKSpriteNode(imageNamed: fallbackImageName)
-            DebugConfig.debugPrint("Using fallback static image: \(fallbackImageName)")
+            // FALLBACK: Use KikimoraBabyContent when assets are missing
+            DebugConfig.debugPrint(
+                "🔄 Fallback: Using KikimoraBabyContent instead of missing \(petData.species.displayName) \(petData.stage.displayName) \(petData.emotion.displayName)"
+            )
+
+            let fallbackFrames = [
+                "Pet/KikimoraBabyContentIdleFr1",
+                "Pet/KikimoraBabyContentIdleFr2",
+                "Pet/KikimoraBabyContentIdleFr3",
+                "Pet/KikimoraBabyContentIdleFr4",
+            ]
+
+            var fallbackTextures: [SKTexture] = []
+            for framePath in fallbackFrames {
+                let texture = SKTexture(imageNamed: framePath)
+                if texture.size() != CGSize.zero {
+                    fallbackTextures.append(texture)
+                }
+            }
+
+            if !fallbackTextures.isEmpty {
+                pet = SKSpriteNode(texture: fallbackTextures[0])
+                if fallbackTextures.count > 1 {
+                    let idleAnimation = SKAction.animate(with: fallbackTextures, timePerFrame: 0.5)
+                    let repeatForever = SKAction.repeatForever(idleAnimation)
+                    pet.run(repeatForever, withKey: "idleAnimation")
+                }
+            } else {
+                // Ultimate fallback - should never happen
+                pet = SKSpriteNode(color: .gray, size: CGSize(width: 50, height: 50))
+                DebugConfig.debugPrint("❌ CRITICAL: Even fallback assets are missing!")
+            }
         }
-        
-        configurePetSprite(pet, imageName: animationFrames.first ?? petData.petImageName)
+
+        configurePetSprite(
+            pet, imageName: animationFrames.first ?? "Pet/KikimoraBabyContentIdleFr1")
     }
-    
+
     /// Configures the pet sprite with common properties
     private func configurePetSprite(_ pet: SKSpriteNode, imageName: String) {
         // Debug print to check if image was loaded
@@ -165,25 +219,25 @@ class GameScene: SKScene {
             DebugConfig.debugPrint("Pet image loaded successfully: \(imageName)")
             DebugConfig.debugPrint("Pet size: \(pet.size)")
         }
-        
+
         // Keep original size but scale it down to fit
-        let scale: CGFloat = 0.2 // Scale down to fit
+        let scale: CGFloat = 0.2  // Scale down to fit
         pet.size = CGSize(width: pet.size.width * scale, height: pet.size.height * scale)
-        
+
         // Set the anchor point to the bottom center
         pet.anchorPoint = CGPoint(x: 0.5, y: 0.0)
-        
+
         // Position the pet at the center (0,0 since we set anchorPoint to center)
-        pet.position = CGPoint(x: 0, y: -15) // Moved up by 50 points
+        pet.position = CGPoint(x: 0, y: -15)  // Moved up by 50 points
         DebugConfig.debugPrint("Pet position: \(pet.position)")
         DebugConfig.debugPrint("Scene frame: \(frame)")
-        
+
         // Name (changed from "egg" to "pet" to be more generic)
         pet.name = "pet"
-        
+
         // Add the pet to the scene
         addChild(pet)
-        
+
         // Visualize the hit area if debug flag is enabled
         if DebugConfig.shouldShowHitArea {
             let hitAreaNode = SKShapeNode(rect: pet.frame)
@@ -194,7 +248,7 @@ class GameScene: SKScene {
             DebugConfig.debugPrint("Added hit area visualization: \(pet.frame)")
         }
     }
-    
+
     // Function to render evolution button
     private func setupEvolutionButton() {
         // Create evolution button using image asset
@@ -202,31 +256,32 @@ class GameScene: SKScene {
         evolutionButton!.position = CGPoint(x: 0, y: -25)
         evolutionButton!.zPosition = 10
         evolutionButton!.name = "evolution_button"
-        
+
         // Scale the button if needed (adjust this value to make it larger/smaller)
         evolutionButton!.setScale(0.2)
-        
+
         addChild(evolutionButton!)
-        
+
         // Initially hide the button
         evolutionButton!.isHidden = true
-        
+
         DebugConfig.debugPrint("Evolution button created and hidden")
     }
-    
+
     func updateEvolutionButton() {
         guard let petData = self.petData,
-              let button = evolutionButton else { return }
-        
+            let button = evolutionButton
+        else { return }
+
         let shouldShow = petData.isReadyToEvolve() && !petData.isDead
         button.isHidden = !shouldShow
-        
+
         DebugConfig.debugPrint("Evolution button visibility: \(shouldShow ? "visible" : "hidden")")
     }
-    
+
     func playTapAnimation(_ pet: SKSpriteNode) {
         guard let petData = self.petData else { return }
-        
+
         if petData.stage == .egg {
             // Play wiggle animation for eggs
             wiggleEgg(pet)
@@ -235,30 +290,30 @@ class GameScene: SKScene {
             playTappedAnimation(pet)
         }
     }
-    
+
     private func wiggleEgg(_ pet: SKSpriteNode) {
         // Create a sequence of actions for the wiggle (only for eggs)
         let rotateRight = SKAction.rotate(toAngle: .pi / 20, duration: 0.2)
         let rotateLeft = SKAction.rotate(toAngle: -.pi / 20, duration: 0.2)
         let wiggle = SKAction.sequence([rotateRight, rotateLeft])
-        let repeatWiggle = SKAction.repeat(wiggle, count: 2) // Wiggle twice and stop
+        let repeatWiggle = SKAction.repeat(wiggle, count: 2)  // Wiggle twice and stop
         let returnToCenter = SKAction.rotate(toAngle: 0, duration: 0.2)
-        
+
         // Combine all actions into one sequence
         let fullAnimation = SKAction.sequence([repeatWiggle, returnToCenter])
-        
+
         // Run the animation
         pet.run(fullAnimation, withKey: "tapAnimation")
-        
+
         DebugConfig.debugPrint("🥚 Playing egg wiggle animation")
     }
-    
+
     private func playTappedAnimation(_ pet: SKSpriteNode) {
         guard let petData = self.petData else { return }
-        
+
         // Get tapped animation frames
         let tappedFrames = petData.petTappedAnimationFrames
-        
+
         // Create textures from tapped animation frame paths
         var textures: [SKTexture] = []
         for framePath in tappedFrames {
@@ -270,26 +325,26 @@ class GameScene: SKScene {
                 DebugConfig.debugPrint("Failed to load tapped animation frame: \(framePath)")
             }
         }
-        
+
         // Play tapped animation if we have frames
         if textures.count > 1 {
             // Stop current idle animation temporarily
             pet.removeAction(forKey: "idleAnimation")
-            
+
             // Create tapped animation (plays once)
-            let tappedAnimation = SKAction.animate(with: textures, timePerFrame: 0.3) // Faster than idle
-            
+            let tappedAnimation = SKAction.animate(with: textures, timePerFrame: 0.3)  // Faster than idle
+
             // Create completion action to restart idle animation
             let restartIdleAnimation = SKAction.run { [weak self] in
                 self?.restartIdleAnimation(pet)
             }
-            
+
             // Combine tapped animation with idle restart
             let sequence = SKAction.sequence([tappedAnimation, restartIdleAnimation])
-            
+
             // Run the tapped animation
             pet.run(sequence, withKey: "tapAnimation")
-            
+
             DebugConfig.debugPrint("🎯 Playing tapped animation with \(textures.count) frames")
         } else {
             // Fallback to a simple scale animation if no tapped frames available
@@ -297,17 +352,17 @@ class GameScene: SKScene {
             let scaleUp = SKAction.scale(to: 1.0, duration: 0.1)
             let scaleAnimation = SKAction.sequence([scaleDown, scaleUp])
             pet.run(scaleAnimation, withKey: "tapAnimation")
-            
+
             DebugConfig.debugPrint("🎯 Playing fallback scale animation (no tapped frames found)")
         }
     }
-    
+
     private func restartIdleAnimation(_ pet: SKSpriteNode) {
         guard let petData = self.petData else { return }
-        
+
         // Only restart idle animation for non-egg pets
         guard petData.stage != .egg else { return }
-        
+
         // Get idle animation frames
         let animationFrames = petData.petAnimationFrames
         var textures: [SKTexture] = []
@@ -317,7 +372,7 @@ class GameScene: SKScene {
                 textures.append(texture)
             }
         }
-        
+
         // Restart idle animation if we have frames
         if textures.count > 1 {
             let idleAnimation = SKAction.animate(with: textures, timePerFrame: 0.5)
@@ -326,41 +381,45 @@ class GameScene: SKScene {
             DebugConfig.debugPrint("🔄 Restarted idle animation after tap")
         }
     }
-    
+
     // Legacy wiggle function - now only used internally for eggs
     func wigglePet(_ pet: SKSpriteNode) {
         // Redirect to new tap animation system
         playTapAnimation(pet)
     }
-    
+
     // Method to handle tap points from SwiftUI
     func onTap(_ point: CGPoint) {
         DebugConfig.debugPrint("Received tap at: \(point)")
-        
+
         // Check if evolution button was tapped
         if let button = evolutionButton,
-           !button.isHidden,
-           button.contains(point) {
+            !button.isHidden,
+            button.contains(point)
+        {
+            HapticManager.shared.playSelection()
             handleEvolutionButtonTap()
             return
         }
-        
+
         // Check if pet was tapped
         if let pet = childNode(withName: "pet") as? SKSpriteNode,
-           pet.contains(point) {
+            pet.contains(point)
+        {
             handlePetTap(pet, at: point)
             return
         }
-        
+
         // Show miss indicator if nothing was tapped
         showTapIndicator(at: point, success: false)
+        HapticManager.shared.playLightImpact()  // Light impact for background tap
     }
-    
+
     private func handleEvolutionButtonTap() {
         guard let petData = self.petData else { return }
-        
+
         DebugConfig.debugPrint("🌟 Evolution button tapped!")
-        
+
         // Check if this is an egg evolution to play special hatch animation
         if petData.stage == .egg && petData.isReadyToEvolve() {
             playEggHatchAnimation {
@@ -372,101 +431,106 @@ class GameScene: SKScene {
             completeEvolution()
         }
     }
-    
+
     private func playEggHatchAnimation(completion: @escaping () -> Void) {
         guard let pet = childNode(withName: "pet") as? SKSpriteNode else {
             completion()
             return
         }
-        
+
         DebugConfig.debugPrint("🥚 Playing egg hatch animation")
-        
+        HapticManager.shared.playStart()  // Start haptic for egg crack sequence
+
         // Create animation frames
         let frame1 = SKTexture(imageNamed: "Egg/egg-2-wo-cracked1")
         let frame2 = SKTexture(imageNamed: "Egg/egg-2-wo-cracked2")
         let frames = [frame1, frame2]
-        
+
         // Create animation action
         let animateAction = SKAction.animate(with: frames, timePerFrame: 0.3)
-        let repeatAnimation = SKAction.repeat(animateAction, count: 2) // Play twice
-        
+        let repeatAnimation = SKAction.repeat(animateAction, count: 2)  // Play twice
+
         // Create completion action
         let completionAction = SKAction.run {
             completion()
         }
-        
+
         // Combine animation and completion
         let sequence = SKAction.sequence([repeatAnimation, completionAction])
-        
+
         // Run the animation on the pet sprite
         pet.run(sequence)
     }
-    
+
     private func completeEvolution() {
         guard let petData = self.petData else { return }
-        
+
         if petData.tryNaturalEvolution() {
             // Evolution successful
             DebugConfig.debugPrint("✅ Evolution successful!")
-            
+            HapticManager.shared.playSuccess()  // Success haptic
+
             // Update the pet display
             updatePetDisplay()
-            
+
             // Add evolution effect
             showEvolutionEffect()
-            
+
             // Notify observers (ContentView) about the evolution
             NotificationCenter.default.post(name: .petEvolved, object: petData)
         } else {
             DebugConfig.debugPrint("❌ Evolution failed - requirements not met")
             showTapIndicator(at: evolutionButton!.position, success: false)
+            HapticManager.shared.playError()
         }
     }
-    
+
     private func handlePetTap(_ pet: SKSpriteNode, at location: CGPoint) {
         guard let petData = self.petData else { return }
-        
+
         // Don't allow feeding if pet is dead
         if petData.isDead {
             showTapIndicator(at: location, success: false)
+            HapticManager.shared.playError()
             return
         }
-                
+
         // Show success indicator
         showTapIndicator(at: location, success: true)
-        
+        HapticManager.shared.playLightImpact()  // Light tap feel
+
         // Play appropriate tap animation (wiggle for eggs, tapped animation for pets)
         playTapAnimation(pet)
-        
+
         // Update evolution button in case pet became ready to evolve
         updateEvolutionButton()
     }
-    
+
     private func showEvolutionEffect() {
         // Create sparkle effect at pet position
         let sparkle = SKSpriteNode(color: .yellow, size: CGSize(width: 10, height: 10))
         sparkle.position = CGPoint(x: 0, y: 0)
         sparkle.zPosition = 15
-        
+
         let scaleUp = SKAction.scale(to: 3.0, duration: 0.3)
         let fadeOut = SKAction.fadeOut(withDuration: 0.3)
         let remove = SKAction.removeFromParent()
-        
+
         let sequence = SKAction.sequence([
             SKAction.group([scaleUp, fadeOut]),
-            remove
+            remove,
         ])
-        
+
         sparkle.run(sequence)
         addChild(sparkle)
-        
+
         DebugConfig.debugPrint("✨ Evolution effect played")
     }
-    
+
     private func showTapIndicator(at location: CGPoint, success: Bool) {
         // Only show tap indicators in debug mode
         guard DebugConfig.shouldShowTapIndicators else { return }
-        
+
         let indicator = SKShapeNode(circleOfRadius: 4)
         indicator.fillColor = success ? .green : .red
         indicator.strokeColor = .white
@@ -474,23 +538,23 @@ class GameScene: SKScene {
         indicator.position = location
         indicator.alpha = 0.8
         indicator.zPosition = 100
-        
+
         addChild(indicator)
-        
+
         // Animate the indicator
         let scaleUp = SKAction.scale(to: 1.5, duration: 0.1)
         let scaleDown = SKAction.scale(to: 0.5, duration: 0.1)
         let fadeOut = SKAction.fadeOut(withDuration: 0.3)
         let remove = SKAction.removeFromParent()
-        
+
         let sequence = SKAction.sequence([
             scaleUp,
             scaleDown,
             SKAction.wait(forDuration: 0.2),
             fadeOut,
-            remove
+            remove,
         ])
-        
+
         indicator.run(sequence)
     }
 }

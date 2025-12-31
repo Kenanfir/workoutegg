@@ -459,6 +459,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "WorkoutEgg Watch App/WorkoutEgg Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -476,7 +477,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.knWorkoutEgg.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Pet-Jam.watchkitapp";
 				PRODUCT_NAME = "Pet-Jam";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -492,6 +493,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "WorkoutEgg Watch App/WorkoutEgg Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -509,7 +511,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.knWorkoutEgg.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Pet-Jam.watchkitapp";
 				PRODUCT_NAME = "Pet-Jam";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -527,9 +529,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8Z84F9SJ7Z;
-				INFOPLIST_KEY_CFBundleDisplayName = WorkoutEgg;
+				INFOPLIST_KEY_CFBundleDisplayName = "Pet-Jam";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.knWorkoutEgg;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Pet-Jam";
 				PRODUCT_NAME = "Pet-Jam";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
@@ -542,9 +545,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8Z84F9SJ7Z;
-				INFOPLIST_KEY_CFBundleDisplayName = WorkoutEgg;
+				INFOPLIST_KEY_CFBundleDisplayName = "Pet-Jam";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.knWorkoutEgg;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Pet-Jam";
 				PRODUCT_NAME = "Pet-Jam";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;

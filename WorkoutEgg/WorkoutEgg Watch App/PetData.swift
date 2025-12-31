@@ -5,8 +5,8 @@
 //  Created by Kenan Firmansyah on 01/06/25.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 // MARK: - Data Models
 
@@ -15,11 +15,11 @@ enum PetSpecies: String, CaseIterable, Codable {
     case fufufafa = "FUFUFAFA"
     case bubbles = "BUBBLES"
     case sparkle = "SPARKLE"
-    
+
     var displayName: String {
         return rawValue
     }
-    
+
     var camelCaseName: String {
         switch self {
         case .kikimora: return "Kikimora"
@@ -38,11 +38,11 @@ enum PetEmotion: String, CaseIterable, Codable {
     case sleepy = "SLEEPY"
     case tantrum = "TANTRUM"
     case content = "CONTENT"
-    
+
     var displayName: String {
         return rawValue
     }
-    
+
     var camelCaseName: String {
         switch self {
         case .happy: return "Happy"
@@ -54,7 +54,7 @@ enum PetEmotion: String, CaseIterable, Codable {
         case .content: return "Content"
         }
     }
-    
+
     var color: Color {
         switch self {
         case .happy: return .green
@@ -75,7 +75,7 @@ enum PetStage: Int, CaseIterable, Codable {
     case teen = 3
     case adult = 4
     case elder = 5
-    
+
     var displayName: String {
         switch self {
         case .egg: return "EGG"
@@ -86,7 +86,7 @@ enum PetStage: Int, CaseIterable, Codable {
         case .elder: return "ELDER"
         }
     }
-    
+
     var camelCaseName: String {
         switch self {
         case .egg: return "Egg"
@@ -114,22 +114,22 @@ class PetData {
     var caloriesTemp: Double
     var isActive: Bool
     var createdDate: Date
-    var isDead: Bool // New: Track if pet has died
-    var missedDaysCount: Int // New: Track consecutive missed days
-    var currentDayCalories: Double // New: Track current day's calories from HealthKit
-    var currentDayFeedCount: Int // New: Track current day's feed interactions
-    var lastFeedResetDate: Date // New: Track when feed count was last reset
+    var isDead: Bool  // New: Track if pet has died
+    var missedDaysCount: Int  // New: Track consecutive missed days
+    var currentDayCalories: Double  // New: Track current day's calories from HealthKit
+    var currentDayFeedCount: Int  // New: Track current day's feed interactions
+    var lastFeedResetDate: Date  // New: Track when feed count was last reset
     var dateTemp: Date
-    
+
     // Computed properties
     var ageInDays: String {
         return "\(age) DAYS"
     }
-    
+
     var streakInDays: String {
         return "\(streak) DAYS"
     }
-    
+
     var totalCaloriesString: String {
         if totalCaloriesConsumed >= 1000 {
             return String(format: "%.0fK KCAL", totalCaloriesConsumed / 1000)
@@ -137,17 +137,18 @@ class PetData {
             return String(format: "%.0f KCAL", totalCaloriesConsumed)
         }
     }
-    
+
     var petImageName: String {
         switch stage {
         case .egg:
             return "Egg/egg-2-wo-normal"
         case .baby, .child, .teen, .adult, .elder:
             // For animated pets, return frame 1 as the default static image
-            return "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)IdleFr1"
+            return
+                "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)IdleFr1"
         }
     }
-    
+
     /// Returns all animation frame paths for the current pet state (for idle animation)
     var petAnimationFrames: [String] {
         switch stage {
@@ -161,7 +162,7 @@ class PetData {
             }
         }
     }
-    
+
     /// Returns all tapped animation frame paths for the current pet state
     var petTappedAnimationFrames: [String] {
         switch stage {
@@ -175,34 +176,39 @@ class PetData {
             }
         }
     }
-    
+
     /// Returns a specific animation frame for the current pet state
     func getPetAnimationFrame(_ frameNumber: Int) -> String {
         switch stage {
         case .egg:
             return "Egg/egg-2-wo-normal"
         case .baby, .child, .teen, .adult, .elder:
-            let clampedFrame = max(1, min(4, frameNumber)) // Ensure frame is between 1-4
-            return "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)IdleFr\(clampedFrame)"
+            let clampedFrame = max(1, min(4, frameNumber))  // Ensure frame is between 1-4
+            return
+                "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)IdleFr\(clampedFrame)"
         }
     }
-    
+
     /// Returns a specific tapped animation frame for the current pet state
     func getPetTappedAnimationFrame(_ frameNumber: Int) -> String {
         switch stage {
         case .egg:
             return "Egg/egg-2-wo-normal"
         case .baby, .child, .teen, .adult, .elder:
-            let clampedFrame = max(1, min(4, frameNumber)) // Ensure frame is between 1-4
-            return "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)TappedFr\(clampedFrame)"
+            let clampedFrame = max(1, min(4, frameNumber))  // Ensure frame is between 1-4
+            return
+                "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)TappedFr\(clampedFrame)"
         }
     }
-    
-    init(age: Int = 1, streak: Int = 0, evoPoints: Int = 0, species: PetSpecies = .kikimora,
-         stage: PetStage = .egg, emotion: PetEmotion = .content, lastFedDate: Date = Date(),
-         cumulativeCalories: Double = 0, lastCalorieResetDate: Date = Date(), caloriesTemp: Double = 0,
-         totalCaloriesConsumed: Double = 0, isActive: Bool = true, createdDate: Date = Date(),
-         isDead: Bool = false, missedDaysCount: Int = 0) {
+
+    init(
+        age: Int = 1, streak: Int = 0, evoPoints: Int = 0, species: PetSpecies = .kikimora,
+        stage: PetStage = .egg, emotion: PetEmotion = .content, lastFedDate: Date = Date(),
+        cumulativeCalories: Double = 0, lastCalorieResetDate: Date = Date(),
+        caloriesTemp: Double = 0,
+        totalCaloriesConsumed: Double = 0, isActive: Bool = true, createdDate: Date = Date(),
+        isDead: Bool = false, missedDaysCount: Int = 0
+    ) {
         self.age = age
         self.streak = streak
         self.evoPoints = evoPoints
@@ -218,84 +224,104 @@ class PetData {
         self.createdDate = createdDate
         self.isDead = isDead
         self.missedDaysCount = missedDaysCount
-        self.currentDayCalories = 0 // Initialize to 0
-        self.currentDayFeedCount = 0 // Initialize to 0
-        self.lastFeedResetDate = Date() // Initialize to current date
+        self.currentDayCalories = 0  // Initialize to 0
+        self.currentDayFeedCount = 0  // Initialize to 0
+        self.lastFeedResetDate = Date()  // Initialize to current date
         self.dateTemp = Date()
     }
-    
+
     func updateAfterFed() {
         let calendar = Calendar.current
         let today = Date()
-        
+
         // Only increment age and streak if the pet hasn't been fed today
         if !calendar.isDate(lastFedDate, inSameDayAs: today) {
             streak += 1
             lastFedDate = today
             missedDaysCount = 0
         }
-        
+
         addCaloriesConsumed()
-        
+
         // Always increment today's feed count (for UI feedback)
         incrementTodayFeedCount()
-        
+
         // Update emotion based on streak
         updateEmotion()
-        
+
     }
-    
+
     func runAtStartOfApp() {
         let calendar = Calendar.current
         let today = Date()
-        
-        // Only increment age and streak if the pet hasn't been fed today
+
+        // Only increment age if the dateTemp is not today
         if !calendar.isDate(dateTemp, inSameDayAs: today) {
             let daysPassed = calendar.dateComponents([.day], from: dateTemp, to: today).day ?? 0
             age += daysPassed
             dateTemp = today
             caloriesTemp = 0
         }
-        
-        // Update emotion based on streak
+
+        // CRITICAL: Check if pet should be dead from neglect
+        // This is done by checking days since last fed
+        let daysSinceLastFed =
+            calendar.dateComponents([.day], from: lastFedDate, to: today).day ?? 0
+        if daysSinceLastFed >= 3 && !isDead {
+            isDead = true
+            emotion = .sad
+            missedDaysCount = daysSinceLastFed
+            DebugConfig.debugPrint(
+                "💀 Pet died from neglect during runAtStartOfApp! Days since last fed: \(daysSinceLastFed)"
+            )
+        } else if daysSinceLastFed > 0 && daysSinceLastFed < 3 {
+            // Pet is alive but missed some days - reset streak
+            streak = 0
+            missedDaysCount = daysSinceLastFed
+        }
+
+        // Update emotion based on streak (if not dead)
         updateEmotion()
     }
-    
+
     func calculateEvoPoints() -> Int {
         return 0
     }
-    
+
     func addCaloriesConsumed() {
         let calories: Double = cumulativeCalories - caloriesTemp
         totalCaloriesConsumed += calories
         caloriesTemp = cumulativeCalories
     }
-    
+
     func checkMissedFed() -> Bool {
         let calendar = Calendar.current
         let today = Date()
-        
+
         // Calculate how many days since last fed
-        let daysSinceLastFed = calendar.dateComponents([.day], from: lastFedDate, to: today).day ?? 0
-        
+        let daysSinceLastFed =
+            calendar.dateComponents([.day], from: lastFedDate, to: today).day ?? 0
+
         if daysSinceLastFed > 0 {
             missedDaysCount = daysSinceLastFed
-            
+
             if daysSinceLastFed >= 3 {
                 // Pet dies after 3 days of neglect
                 isDead = true
                 emotion = .sad
-                return true // Indicates pet died
+                return true  // Indicates pet died
             } else {
-                // Pet missed some days but still alive - reset streak and update emotion based on new streak
+                // Pet missed some days but still alive - send warning notification
+                NotificationManager.sendNeglectWarningNotification(daysMissed: daysSinceLastFed)
+                // Reset streak and update emotion based on new streak
                 streak = 0
-                updateEmotion() // Use the emotion logic based on current streak
+                updateEmotion()
             }
         }
-        
+
         return false
     }
-    
+
     func checkOldAge() -> Bool {
         // Pet dies of old age after reaching a certain age
         if age >= 1000 {
@@ -305,14 +331,14 @@ class PetData {
         }
         return false
     }
-    
+
     func updateCumulativeCalories(todayCalories: Double, cumulativeCalories: Double? = nil) {
         // Store the current day's calories
         self.currentDayCalories = todayCalories
-        
+
         let calendar = Calendar.current
         let today = Date()
-        
+
         DebugConfig.debugPrint("🔄 PetData updateCumulativeCalories:")
         DebugConfig.debugPrint("   - Stage: \(stage.displayName)")
         DebugConfig.debugPrint("   - todayCalories: \(todayCalories)")
@@ -320,7 +346,7 @@ class PetData {
         DebugConfig.debugPrint("   - Current pet cumulativeCalories: \(self.cumulativeCalories)")
         DebugConfig.debugPrint("   - Current totalCaloriesConsumed: \(self.totalCaloriesConsumed)")
         DebugConfig.debugPrint("   - Setting currentDayCalories to: \(todayCalories)")
-        
+
         if !calendar.isDate(lastCalorieResetDate, inSameDayAs: today) {
             if stage == .egg {
                 lastCalorieResetDate = today
@@ -329,31 +355,37 @@ class PetData {
                 lastCalorieResetDate = today
             }
         }
-        
+
         if stage == .egg {
             // For egg stage, use the cumulative calories directly from HealthKit if provided
             // BUT do NOT update totalCaloriesConsumed until the pet actually evolves
             if let cumulativeCalories = cumulativeCalories {
                 self.cumulativeCalories = cumulativeCalories
-                DebugConfig.debugPrint("   - Egg stage: Using HealthKit cumulative calories: \(cumulativeCalories)")
-                DebugConfig.debugPrint("   - Egg stage: totalCaloriesConsumed remains at: \(self.totalCaloriesConsumed) (will update on evolution)")
+                DebugConfig.debugPrint(
+                    "   - Egg stage: Using HealthKit cumulative calories: \(cumulativeCalories)")
+                DebugConfig.debugPrint(
+                    "   - Egg stage: totalCaloriesConsumed remains at: \(self.totalCaloriesConsumed) (will update on evolution)"
+                )
             } else {
                 // Fallback to previous logic if cumulative calories not provided
                 self.cumulativeCalories = getCumulativeCaloriesSinceEgg() + todayCalories
-                DebugConfig.debugPrint("   - Egg stage: Using fallback calculation: \(self.cumulativeCalories)")
-                DebugConfig.debugPrint("   - Egg stage: totalCaloriesConsumed remains at: \(self.totalCaloriesConsumed) (will update on evolution)")
+                DebugConfig.debugPrint(
+                    "   - Egg stage: Using fallback calculation: \(self.cumulativeCalories)")
+                DebugConfig.debugPrint(
+                    "   - Egg stage: totalCaloriesConsumed remains at: \(self.totalCaloriesConsumed) (will update on evolution)"
+                )
             }
         } else {
             // For other stages, use only today's calories
             self.cumulativeCalories = todayCalories
             DebugConfig.debugPrint("   - Non-egg stage: Using today's calories: \(todayCalories)")
         }
-        
+
         DebugConfig.debugPrint("   - Final pet cumulativeCalories: \(self.cumulativeCalories)")
         DebugConfig.debugPrint("   - Final currentDayCalories: \(self.currentDayCalories)")
         DebugConfig.debugPrint("   - Final totalCaloriesConsumed: \(self.totalCaloriesConsumed)")
     }
-    
+
     private func getCumulativeCaloriesSinceEgg() -> Double {
         let calendar = Calendar.current
         if calendar.isDate(lastCalorieResetDate, inSameDayAs: Date()) {
@@ -361,7 +393,7 @@ class PetData {
         }
         return cumulativeCalories
     }
-    
+
     private func getCurrentDayCalories() -> Double {
         return currentDayCalories
     }
@@ -371,28 +403,28 @@ class PetData {
         resetFeedCountIfNewDay()
         return currentDayFeedCount
     }
-    
+
     /// Increments the feed count for today, resetting if it's a new day
     func incrementTodayFeedCount() {
         resetFeedCountIfNewDay()
         currentDayFeedCount += 1
     }
-    
+
     /// Resets feed count if it's a new day
     private func resetFeedCountIfNewDay() {
         let calendar = Calendar.current
         let today = Date()
-        
+
         if !calendar.isDate(lastFeedResetDate, inSameDayAs: today) {
             currentDayFeedCount = 0
             lastFeedResetDate = today
         }
     }
-    
+
     private func updateEmotion() {
         // Don't change emotion if pet is dead
         if isDead { return }
-        
+
         switch streak {
         case 3...5:
             emotion = .sad
@@ -404,11 +436,11 @@ class PetData {
             emotion = .excited
         case 101...150:
             emotion = .tantrum
-        default :
+        default:
             emotion = .content
         }
     }
-    
+
     // Evolution Condition (Requirements)
     func isReadyToEvolve() -> Bool {
         DebugConfig.debugPrint("🔍 Checking evolution readiness:")
@@ -416,13 +448,14 @@ class PetData {
         DebugConfig.debugPrint("   - Current age: \(age) days")
         DebugConfig.debugPrint("   - Current cumulativeCalories: \(cumulativeCalories)")
         DebugConfig.debugPrint("   - Current currentDayCalories: \(currentDayCalories)")
-        
+
         let readyToEvolve: Bool
-        
+
         switch stage {
         case .egg:
             readyToEvolve = currentDayCalories >= 200
-            DebugConfig.debugPrint("   - Egg evolution check: \(currentDayCalories) >= 200 = \(readyToEvolve)")
+            DebugConfig.debugPrint(
+                "   - Egg evolution check: \(currentDayCalories) >= 200 = \(readyToEvolve)")
             return readyToEvolve
         case .baby:
             readyToEvolve = age >= 7  // 7 days as baby
@@ -444,29 +477,32 @@ class PetData {
             DebugConfig.debugPrint("   - Elder stage: cannot evolve further")
             break
         }
-        
-        DebugConfig.debugPrint("   - Final result: NOT ready to evolve (elder stage or no valid check)")
+
+        DebugConfig.debugPrint(
+            "   - Final result: NOT ready to evolve (elder stage or no valid check)")
         return false
     }
-    
+
     // MARK: - Evolution Methods
-    
+
     /// Attempts to evolve the pet naturally based on current requirements
     /// Returns true if evolution occurred, false if requirements not met
     func tryNaturalEvolution() -> Bool {
         guard !isDead else { return false }
         guard isReadyToEvolve() else { return false }
-        
+
         let previousStage = stage
-//        let previousCumulativeCalories = cumulativeCalories
-        
+        //        let previousCumulativeCalories = cumulativeCalories
+
         // Perform the evolution
         switch stage {
         case .egg:
             stage = .baby
             // Transfer accumulated calories to totalCaloriesConsumed when hatching
-//            totalCaloriesConsumed += cumulativeCalories
-            DebugConfig.debugPrint("🥚➡️🐣 Egg hatched! Transferred \(cumulativeCalories) calories to totalCaloriesConsumed")
+            totalCaloriesConsumed += cumulativeCalories
+            DebugConfig.debugPrint(
+                "🥚➡️🐣 Egg hatched! Transferred \(cumulativeCalories) calories to totalCaloriesConsumed"
+            )
         case .baby:
             stage = .child
         case .child:
@@ -476,37 +512,43 @@ class PetData {
         case .adult:
             stage = .elder
         case .elder:
-            return false // Already at max stage
+            return false  // Already at max stage
         }
-        
+
         // Update emotion based on current streak
         updateEmotion()
-        
-        DebugConfig.debugPrint("🌟 Natural evolution: \(previousStage.displayName) → \(stage.displayName)")
+
+        DebugConfig.debugPrint(
+            "🌟 Natural evolution: \(previousStage.displayName) → \(stage.displayName)")
         DebugConfig.debugPrint("📅 Age remains: \(age) days (actual days alive)")
         DebugConfig.debugPrint("🔥 Total calories consumed: \(totalCaloriesConsumed)")
-        
+
+        // Send evolution completed notification
+        NotificationManager.sendEvolutionCompletedNotification(newStage: stage.displayName)
+
         return true
     }
-    
+
     // MARK: - Development/Testing Methods
-    
+
     /// Forces the pet to evolve to the next stage by setting age to the minimum required
     /// This is for development/testing purposes
     func forceEvolveToNextStage() {
         // Don't evolve if pet is dead
         if isDead { return }
-        
+
         let previousStage = stage
-//        let previousCumulativeCalories = cumulativeCalories
-        
+        //        let previousCumulativeCalories = cumulativeCalories
+
         // Force evolution to next stage (bypassing normal requirements)
         switch stage {
         case .egg:
             stage = .baby
             // Transfer accumulated calories to totalCaloriesConsumed when hatching (even for force evolution)
-//            totalCaloriesConsumed += cumulativeCalories
-            DebugConfig.debugPrint("🥚➡️🐣 Force hatched! Transferred \(cumulativeCalories) calories to totalCaloriesConsumed")
+            //            totalCaloriesConsumed += cumulativeCalories
+            DebugConfig.debugPrint(
+                "🥚➡️🐣 Force hatched! Transferred \(cumulativeCalories) calories to totalCaloriesConsumed"
+            )
         case .baby:
             stage = .child
         case .child:
@@ -520,11 +562,12 @@ class PetData {
             DebugConfig.debugPrint("🦴 Pet is already at elder stage (max)")
             return
         }
-        
+
         // Update emotion based on current streak
         updateEmotion()
-        
-        DebugConfig.debugPrint("🚀 Force evolved from \(previousStage.displayName) to \(stage.displayName)")
+
+        DebugConfig.debugPrint(
+            "🚀 Force evolved from \(previousStage.displayName) to \(stage.displayName)")
         DebugConfig.debugPrint("📅 Age remains: \(age) days (actual days alive)")
         DebugConfig.debugPrint("🔥 Total calories consumed: \(totalCaloriesConsumed)")
     }
@@ -540,13 +583,13 @@ class LongestLivedPetData {
     var finalStreak: Int
     var createdDate: Date
     var diedDate: Date
-    var causeOfDeath: String // "evolved", "neglected", "old_age", etc.
-    
+    var causeOfDeath: String  // "evolved", "neglected", "old_age", etc.
+
     // Computed properties
     var ageInDays: String {
         return "\(age) DAYS"
     }
-    
+
     var totalCaloriesString: String {
         if totalCaloriesConsumed >= 1000 {
             return String(format: "%.0fK KCAL", totalCaloriesConsumed / 1000)
@@ -554,26 +597,29 @@ class LongestLivedPetData {
             return String(format: "%.0f KCAL", totalCaloriesConsumed)
         }
     }
-    
+
     var petImageName: String {
         switch stage {
         case .egg:
             return "Egg/egg-2-wo-normal"
         case .baby, .child, .teen, .adult, .elder:
             // For animated pets, return frame 1 as the default static image
-            return "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)IdleFr1"
+            return
+                "Pet/\(species.camelCaseName)\(stage.camelCaseName)\(emotion.camelCaseName)IdleFr1"
         }
     }
-    
+
     var lifespan: String {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
         return "\(formatter.string(from: createdDate)) - \(formatter.string(from: diedDate))"
     }
-    
-    init(age: Int, species: PetSpecies, stage: PetStage, emotion: PetEmotion,
-         totalCaloriesConsumed: Double, finalStreak: Int, createdDate: Date,
-         diedDate: Date = Date(), causeOfDeath: String = "unknown") {
+
+    init(
+        age: Int, species: PetSpecies, stage: PetStage, emotion: PetEmotion,
+        totalCaloriesConsumed: Double, finalStreak: Int, createdDate: Date,
+        diedDate: Date = Date(), causeOfDeath: String = "unknown"
+    ) {
         self.age = age
         self.species = species
         self.stage = stage
@@ -584,7 +630,7 @@ class LongestLivedPetData {
         self.diedDate = diedDate
         self.causeOfDeath = causeOfDeath
     }
-    
+
     // Create from current PetData
     convenience init(from petData: PetData, causeOfDeath: String = "unknown") {
         self.init(
@@ -600,4 +646,3 @@ class LongestLivedPetData {
         )
     }
 }
-

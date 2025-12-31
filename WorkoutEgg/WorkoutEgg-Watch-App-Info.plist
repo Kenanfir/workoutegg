@@ -12,5 +12,9 @@
 	</array>
 	<key>WKBackgroundModes</key>
 	<array/>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Pet-Jam uses your active calories burned to feed and grow your virtual pet. The more you exercise, the more your pet thrives!</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Pet-Jam tracks your workout progress to keep your virtual pet healthy and happy.</string>
 </dict>
 </plist>
